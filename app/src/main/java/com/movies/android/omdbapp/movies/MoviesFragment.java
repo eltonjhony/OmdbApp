@@ -1,5 +1,6 @@
 package com.movies.android.omdbapp.movies;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,25 +12,32 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.movies.android.omdbapp.R;
-import com.movies.android.omdbapp.data.MovieServiceImpl;
 import com.movies.android.omdbapp.data.model.Movie;
+import com.movies.android.omdbapp.data.model.MovieDetail;
+import com.movies.android.omdbapp.data.remote.MovieApi;
 import com.movies.android.omdbapp.databinding.FragmentMoviesBinding;
+import com.movies.android.omdbapp.infraestructure.MyApplication;
+import com.movies.android.omdbapp.moviedetail.DetailsActivity;
 import com.movies.android.omdbapp.movies.adapters.MoviesAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by eltonjhony on 3/31/17.
  */
-
 public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     private FragmentMoviesBinding mBinding;
     private MoviesContract.Actions mActions;
     private MoviesAdapter mAdapter;
+
+    @Inject MovieApi mApi;
 
     public MoviesFragment() {
     }
@@ -41,8 +49,14 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAdapter = new MoviesAdapter(new ArrayList<Movie>(0));
-        mActions = new MoviesPresenter(new MovieServiceImpl(), this);
+        MyApplication.getServiceComponent().inject(this);
+        mActions = new MoviesPresenter(mApi, this);
+        mAdapter = new MoviesAdapter(new ArrayList<Movie>(0), new MoviesAdapter.OnMovieClickListener() {
+            @Override
+            public void onMovieClicked(String id) {
+                mActions.openDetails(id);
+            }
+        });
     }
 
     @Override
@@ -55,7 +69,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movies, container, false);
-        setupRecyclerView();
+        setupAdapter();
         return mBinding.getRoot();
     }
 
@@ -79,11 +93,18 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     }
 
     @Override
-    public void showMovieDetails(String movieId) {
-
+    public void showMovieDetails(MovieDetail detail) {
+        Intent intent = new Intent(getContext(), DetailsActivity.class);
+        intent.putExtra(DetailsActivity.MOVIE_EXTRA, detail);
+        startActivity(intent);
     }
 
-    private void setupRecyclerView() {
+    @Override
+    public void showError(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    private void setupAdapter() {
         RecyclerView rv = mBinding.movieList;
         rv.setAdapter(mAdapter);
 

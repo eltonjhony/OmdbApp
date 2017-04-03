@@ -14,6 +14,9 @@ android {
     dataBinding {
         enabled true
     }
+    lintOptions {
+        abortOnError false
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -34,6 +37,12 @@ dependencies {
     final rulesVersion = '0.5'
     final espressoVersion = '2.2.2'
     final retrofitVersion = '2.0.2'
+    final langVersion = '3.5'
+    final daggerVersion = '2.0.2'
+    final rxAndroidVersion = '1.2.1'
+    final rxJavaVersion = '1.1.6'
+    final annotationVersion = '1.0'
+    final converterVersion = '2.0.0'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -51,6 +60,15 @@ dependencies {
     compile "com.squareup.retrofit2:retrofit:${retrofitVersion}"
     compile "com.squareup.retrofit2:converter-gson:${retrofitVersion}"
     compile "com.squareup.picasso:picasso:${picassoVersion}"
+    compile "org.apache.commons:commons-lang3:${langVersion}"
+    compile "com.google.dagger:dagger:${daggerVersion}"
+    compile "javax.annotation:jsr250-api:${annotationVersion}"
+    compile "io.reactivex:rxandroid:${rxAndroidVersion}"
+    compile "io.reactivex:rxjava:${rxJavaVersion}"
+    compile "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}"
+    compile "com.squareup.retrofit2:converter-gson:${converterVersion}"
+
+    provided "com.google.dagger:dagger-compiler:${daggerVersion}"
 
     testCompile "junit:junit:${junitVersion}"
     testCompile "org.mockito:mockito-all:${mockitoVersion}"

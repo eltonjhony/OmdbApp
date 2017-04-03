@@ -1,9 +1,16 @@
 package com.movies.android.omdbapp.movies;
 
+import android.util.Log;
+
 import com.android.annotations.NonNull;
-import com.movies.android.omdbapp.data.MovieServiceApi;
-import com.movies.android.omdbapp.data.model.Movie;
+import com.movies.android.omdbapp.data.remote.ErrorHandler;
+import com.movies.android.omdbapp.data.model.MovieDetail;
 import com.movies.android.omdbapp.data.model.MovieResultWrapper;
+import com.movies.android.omdbapp.data.remote.MovieApi;
+
+import rx.Observer;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by eltonjhony on 3/31/17.
@@ -11,29 +18,63 @@ import com.movies.android.omdbapp.data.model.MovieResultWrapper;
 
 public class MoviesPresenter implements MoviesContract.Actions {
 
-    private MovieServiceApi mApi;
+    private MovieApi mApi;
     private MoviesContract.View mView;
 
-    public MoviesPresenter(MovieServiceApi api, MoviesContract.View view) {
-        this.mApi = api;
+    public MoviesPresenter(MovieApi api, MoviesContract.View view) {
         this.mView = view;
+        this.mApi = api;
     }
 
     @Override
     public void loadMovies() {
         mView.setLoading(true);
+        mApi.fetch("star wars").subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<MovieResultWrapper>() {
+                    @Override
+                    public void onCompleted() {
+                    }
 
-        mApi.getMovies(new MovieServiceApi.MovieServiceCallback<MovieResultWrapper>() {
-            @Override
-            public void onLoaded(MovieResultWrapper movieResultWrapper) {
-                mView.setLoading(false);
-                mView.showMovies(movieResultWrapper.movies);
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        ErrorHandler.Error error = new ErrorHandler(e).extract();
+                        Log.e(error.code, error.message);
+                        mView.setLoading(false);
+                        mView.showError(error.message);
+                    }
+
+                    @Override
+                    public void onNext(MovieResultWrapper movieResultWrapper) {
+                        mView.setLoading(false);
+                        mView.showMovies(movieResultWrapper.movies);
+                    }
+                });
     }
 
     @Override
-    public void openDetails(@NonNull Movie movie) {
+    public void openDetails(@NonNull String id) {
+        mView.setLoading(true);
+        mApi.getById(id).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<MovieDetail>() {
+                    @Override
+                    public void onCompleted() {
+                    }
 
+                    @Override
+                    public void onError(Throwable e) {
+                        ErrorHandler.Error error = new ErrorHandler(e).extract();
+                        Log.e(error.code, error.message);
+                        mView.setLoading(false);
+                        mView.showError(error.message);
+                    }
+
+                    @Override
+                    public void onNext(MovieDetail movieDetail) {
+                        mView.setLoading(false);
+                        mView.showMovieDetails(movieDetail);
+                    }
+                });
     }
 }

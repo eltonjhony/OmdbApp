@@ -1,8 +1,8 @@
 package com.movies.android.omdbapp;
 
-import com.movies.android.omdbapp.data.MovieServiceApi;
 import com.movies.android.omdbapp.data.model.Movie;
 import com.movies.android.omdbapp.data.model.MovieResultWrapper;
+import com.movies.android.omdbapp.data.remote.MovieApi;
 import com.movies.android.omdbapp.movies.MoviesContract;
 import com.movies.android.omdbapp.movies.MoviesPresenter;
 
@@ -16,6 +16,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.Observer;
 
 /**
  * Created by eltonjhony on 3/31/17.
@@ -33,14 +35,14 @@ public class MoviesPresenterTest {
     private static MovieResultWrapper MOVIE_RESULT_DATA = new MovieResultWrapper(MOVIES);
 
     @Mock
-    private FakeMovieServiceImpl mApi;
+    private MovieApi mApi;
 
     @Mock
     private MoviesContract.View mView;
 
     // simulate callback behavior
     @Captor
-    private ArgumentCaptor<MovieServiceApi.MovieServiceCallback> mLoadMoviesCallbackCaptor;
+    private ArgumentCaptor<Observer<MovieResultWrapper>> mLoadMoviesCallbackCaptor;
 
     private MoviesPresenter mPresenter;
 
@@ -56,8 +58,8 @@ public class MoviesPresenterTest {
         mPresenter.loadMovies();
 
         // callback is captured and triggered with fake data.
-        Mockito.verify(mApi).getMovies(mLoadMoviesCallbackCaptor.capture());
-        mLoadMoviesCallbackCaptor.getValue().onLoaded(MOVIE_RESULT_DATA);
+        Mockito.verify(mApi).fetch(Mockito.anyString());
+        mLoadMoviesCallbackCaptor.getValue().onNext(MOVIE_RESULT_DATA);
 
         // the progress is hid and the movies is shown in the screen
         Mockito.verify(mView).setLoading(false);

@@ -2,6 +2,7 @@ package com.movies.android.omdbapp.movies;
 
 import com.android.annotations.NonNull;
 import com.movies.android.omdbapp.data.model.Movie;
+import com.movies.android.omdbapp.data.model.MovieDetail;
 
 import java.util.List;
 
@@ -16,12 +17,14 @@ public interface MoviesContract {
 
         void showMovies(List<Movie> movies);
 
-        void showMovieDetails(String movieId);
+        void showMovieDetails(MovieDetail movieDetail);
+
+        void showError(String message);
     }
 
     interface Actions {
         void loadMovies();
 
-        void openDetails(@NonNull Movie movie);
+        void openDetails(@NonNull String id);
     }
 }

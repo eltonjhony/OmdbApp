@@ -2,11 +2,13 @@ package com.movies.android.omdbapp.data.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by eltonjhony on 3/31/17.
  */
 
-public class Movie {
+public class Movie implements Serializable {
 
     @SerializedName("imdbID")
     public String id;
@@ -28,5 +30,21 @@ public class Movie {
         this.title = title;
         this.year = year;
         this.posterUrl = posterUrl;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public String getPosterUrl() {
+        return posterUrl;
     }
 }

@@ -6,8 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.movies.android.omdbapp.R;
 import com.movies.android.omdbapp.data.model.Movie;
@@ -19,36 +17,30 @@ import java.util.List;
 /**
  * Created by eltonjhony on 3/31/17.
  */
-
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
 
-    private MovieItemBinding mBinding;
     private List<Movie> mMovies;
+    private OnMovieClickListener mOnMovieClickListener;
 
-    public MoviesAdapter(List<Movie> movies) {
+    public MoviesAdapter(List<Movie> movies, OnMovieClickListener listener) {
         setList(movies);
+        this.mOnMovieClickListener = listener;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.movie_item, parent, false);
+        MovieItemBinding binding = DataBindingUtil.inflate(inflater, R.layout.movie_item, parent, false);
 
-        return new ViewHolder(mBinding);
+        return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Movie movie = mMovies.get(position);
-
-        Picasso.with(holder.thumbnail.getContext())
-                .load(movie.posterUrl)
-                .fit().centerCrop()
-                .placeholder(R.drawable.ic_insert_photo_black_48px)
-                .into(holder.thumbnail);
-
-        holder.title.setText(movie.title);
+        holder.update(movie);
+        holder.setListeners(movie);
     }
 
     @Override
@@ -65,20 +57,35 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         mMovies = movies;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView thumbnail;
-        public TextView title;
+        private MovieItemBinding mLayout;
 
         public ViewHolder(MovieItemBinding binding) {
             super(binding.getRoot());
-            thumbnail = binding.movieThumbnail;
-            title = binding.movieTitle;
+            this.mLayout = binding;
         }
 
-        @Override
-        public void onClick(View v) {
-
+        private void update(Movie movie) {
+            Picasso.with(mLayout.movieThumbnail.getContext())
+                    .load(movie.posterUrl)
+                    .fit().centerCrop()
+                    .placeholder(R.drawable.ic_insert_photo_black_48px)
+                    .into(mLayout.movieThumbnail);
+            mLayout.movieTitle.setText(movie.title);
         }
+
+        private void setListeners(final Movie movie) {
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnMovieClickListener.onMovieClicked(movie.id);
+                }
+            });
+        }
+    }
+
+    public interface OnMovieClickListener {
+        void onMovieClicked(String id);
     }
 }
