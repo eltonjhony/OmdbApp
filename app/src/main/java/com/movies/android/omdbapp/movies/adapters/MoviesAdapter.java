@@ -4,7 +4,6 @@ import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import com.movies.android.omdbapp.R;
@@ -76,12 +75,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         }
 
         private void setListeners(final Movie movie) {
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mOnMovieClickListener.onMovieClicked(movie.id);
-                }
-            });
+            itemView.setOnClickListener(v -> mOnMovieClickListener.onMovieClicked(movie.id));
         }
     }
 

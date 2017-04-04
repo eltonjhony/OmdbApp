@@ -51,12 +51,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         super.onCreate(savedInstanceState);
         MyApplication.getServiceComponent().inject(this);
         mActions = new MoviesPresenter(mApi, this);
-        mAdapter = new MoviesAdapter(new ArrayList<Movie>(0), new MoviesAdapter.OnMovieClickListener() {
-            @Override
-            public void onMovieClicked(String id) {
-                mActions.openDetails(id);
-            }
-        });
+        mAdapter = new MoviesAdapter(new ArrayList<Movie>(0), id -> mActions.openDetails(id));
     }
 
     @Override
@@ -79,12 +74,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
             return;
         }
         final SwipeRefreshLayout srl = mBinding.refreshLayout;
-        srl.post(new Runnable() {
-            @Override
-            public void run() {
-                srl.setRefreshing(isActive);
-            }
-        });
+        srl.post(() -> srl.setRefreshing(isActive));
     }
 
     @Override
@@ -119,11 +109,6 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
-        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mActions.loadMovies();
-            }
-        });
+        refreshLayout.setOnRefreshListener(() -> mActions.loadMovies());
     }
 }

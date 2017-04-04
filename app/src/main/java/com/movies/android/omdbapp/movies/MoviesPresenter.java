@@ -1,12 +1,11 @@
 package com.movies.android.omdbapp.movies;
 
-import android.util.Log;
-
 import com.android.annotations.NonNull;
 import com.movies.android.omdbapp.data.remote.ErrorHandler;
 import com.movies.android.omdbapp.data.model.MovieDetail;
 import com.movies.android.omdbapp.data.model.MovieResultWrapper;
 import com.movies.android.omdbapp.data.remote.MovieApi;
+import com.movies.android.omdbapp.infraestructure.MyLog;
 
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -39,7 +38,7 @@ public class MoviesPresenter implements MoviesContract.Actions {
                     @Override
                     public void onError(Throwable e) {
                         ErrorHandler.Error error = new ErrorHandler(e).extract();
-                        Log.e(error.code, error.message);
+                        MyLog.error(error.code, error.message);
                         mView.setLoading(false);
                         mView.showError(error.message);
                     }
@@ -65,7 +64,7 @@ public class MoviesPresenter implements MoviesContract.Actions {
                     @Override
                     public void onError(Throwable e) {
                         ErrorHandler.Error error = new ErrorHandler(e).extract();
-                        Log.e(error.code, error.message);
+                        MyLog.error(error.code, error.message);
                         mView.setLoading(false);
                         mView.showError(error.message);
                     }

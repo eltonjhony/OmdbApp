@@ -1,28 +1,47 @@
 package com.movies.android.omdbapp;
 
+import android.util.Log;
+
 import com.movies.android.omdbapp.data.model.Movie;
 import com.movies.android.omdbapp.data.model.MovieResultWrapper;
 import com.movies.android.omdbapp.data.remote.MovieApi;
+import com.movies.android.omdbapp.infraestructure.MyLog;
 import com.movies.android.omdbapp.movies.MoviesContract;
 import com.movies.android.omdbapp.movies.MoviesPresenter;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observer;
+import rx.Observable;
+import rx.Scheduler;
+import rx.android.plugins.RxAndroidPlugins;
+import rx.android.plugins.RxAndroidSchedulersHook;
+import rx.schedulers.Schedulers;
+
+import static com.movies.android.omdbapp.data.remote.ErrorHandler.Error.GENERIC_CODE;
+import static com.movies.android.omdbapp.data.remote.ErrorHandler.Error.GENERIC_MESSAGE;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 
 /**
  * Created by eltonjhony on 3/31/17.
  */
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({MyLog.class, Log.class})
 public class MoviesPresenterTest {
 
     private static List<Movie> MOVIES = new ArrayList<Movie>(){{
@@ -40,29 +59,66 @@ public class MoviesPresenterTest {
     @Mock
     private MoviesContract.View mView;
 
-    // simulate callback behavior
-    @Captor
-    private ArgumentCaptor<Observer<MovieResultWrapper>> mLoadMoviesCallbackCaptor;
-
     private MoviesPresenter mPresenter;
 
     @Before
     public void setupMoviesPresenter() {
         MockitoAnnotations.initMocks(this);
+        PowerMockito.mockStatic(MyLog.class, Log.class);
         mPresenter = new MoviesPresenter(mApi, mView);
+        RxAndroidPlugins.getInstance().registerSchedulersHook(new RxAndroidSchedulersHook() {
+            @Override
+            public Scheduler getMainThreadScheduler() {
+                return Schedulers.immediate();
+            }
+        });
     }
 
     @Test
     public void loadMoviesAndPopulateScreen() {
 
+        // When fetch API return mocked data from Backend
+        when(mApi.fetch(anyString())).thenReturn(Observable.just(MOVIE_RESULT_DATA));
+
+        // When the presenter is called to load movies.
         mPresenter.loadMovies();
 
-        // callback is captured and triggered with fake data.
-        Mockito.verify(mApi).fetch(Mockito.anyString());
-        mLoadMoviesCallbackCaptor.getValue().onNext(MOVIE_RESULT_DATA);
+        // Then, the loading should be called with true argument
+        verify(mView, times(1)).setLoading(true);
+
+        // Then, the fetch API should be called.
+        verify(mApi).fetch(anyString());
 
         // the progress is hid and the movies is shown in the screen
-        Mockito.verify(mView).setLoading(false);
-        Mockito.verify(mView).showMovies(MOVIE_RESULT_DATA.movies);
+        verify(mView, times(1)).setLoading(false);
+        verify(mView).showMovies(MOVIE_RESULT_DATA.movies);
+    }
+
+    @Test
+    public void loadMoviesAndReceiveGenericError() throws Exception {
+
+        // When fetch API return generic exception
+        when(mApi.fetch(anyString())).thenReturn(Observable.error(new Exception(GENERIC_MESSAGE)));
+
+        // When the presenter is called to load movies.
+        mPresenter.loadMovies();
+
+        // Then, the loading should be called with true argument
+        verify(mView, times(1)).setLoading(true);
+
+        // Then, the flow should log the error with generic message
+        verifyStatic(times(1));
+        MyLog.error(GENERIC_CODE, GENERIC_MESSAGE);
+
+        // Then, the load should back to false
+        verify(mView, times(1)).setLoading(false);
+
+        // Then, the view showError should be called
+        verify(mView).showError(GENERIC_MESSAGE);
+    }
+
+    @After
+    public void tearDown() {
+        RxAndroidPlugins.getInstance().reset();
     }
 }
