@@ -11,7 +11,7 @@ import java.util.List;
  * Created by eltonjhony on 4/3/17.
  */
 
-public class MovieDetail implements Serializable {
+public class ContentDetail implements Serializable {
 
     @SerializedName("Title")
     private String title;
@@ -61,13 +61,13 @@ public class MovieDetail implements Serializable {
     @SerializedName("Website")
     private String website;
 
-    public MovieDetail() {
+    public ContentDetail() {
     }
 
-    public MovieDetail(String title, String year, String rated, String released,
-                       String runtime, String genre, String director, String awards,
-                       String poster, String language, String country, List<Rating> ratings,
-                       String imdbRating, String type, String production, String website) {
+    public ContentDetail(String title, String year, String rated, String released,
+                         String runtime, String genre, String director, String awards,
+                         String poster, String language, String country, List<Rating> ratings,
+                         String imdbRating, String type, String production, String website) {
         this.title = title;
         this.year = year;
         this.rated = rated;

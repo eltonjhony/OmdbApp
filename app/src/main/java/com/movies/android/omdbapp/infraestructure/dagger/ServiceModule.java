@@ -1,6 +1,6 @@
 package com.movies.android.omdbapp.infraestructure.dagger;
 
-import com.movies.android.omdbapp.data.remote.MovieApi;
+import com.movies.android.omdbapp.data.remote.OmdbApi;
 import com.movies.android.omdbapp.data.remote.RetrofitClient;
 
 import dagger.Module;
@@ -13,7 +13,7 @@ import dagger.Provides;
 public class ServiceModule {
 
     @Provides
-    MovieApi provideMovieApi() {
-        return RetrofitClient.getClient().create(MovieApi.class);
+    OmdbApi provideMovieApi() {
+        return RetrofitClient.getClient().create(OmdbApi.class);
     }
 }

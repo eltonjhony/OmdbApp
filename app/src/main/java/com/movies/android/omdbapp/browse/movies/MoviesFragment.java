@@ -1,4 +1,4 @@
-package com.movies.android.omdbapp.movies;
+package com.movies.android.omdbapp.browse.movies;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -6,22 +6,29 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.movies.android.omdbapp.R;
-import com.movies.android.omdbapp.data.model.Movie;
-import com.movies.android.omdbapp.data.model.MovieDetail;
-import com.movies.android.omdbapp.data.remote.MovieApi;
+import com.movies.android.omdbapp.data.model.Content;
+import com.movies.android.omdbapp.data.model.ContentDetail;
+import com.movies.android.omdbapp.data.remote.OmdbApi;
 import com.movies.android.omdbapp.databinding.FragmentMoviesBinding;
 import com.movies.android.omdbapp.infraestructure.MyApplication;
+import com.movies.android.omdbapp.infraestructure.MyLog;
+import com.movies.android.omdbapp.main.MainActivity;
 import com.movies.android.omdbapp.moviedetail.DetailsActivity;
-import com.movies.android.omdbapp.movies.adapters.MoviesAdapter;
+import com.movies.android.omdbapp.browse.adapters.ContentBrowseAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +42,10 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     private FragmentMoviesBinding mBinding;
     private MoviesContract.Actions mActions;
-    private MoviesAdapter mAdapter;
+    private ContentBrowseAdapter mAdapter;
 
-    @Inject MovieApi mApi;
+    @Inject
+    OmdbApi mApi;
 
     public MoviesFragment() {
     }
@@ -49,15 +57,15 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         MyApplication.getServiceComponent().inject(this);
-        mActions = new MoviesPresenter(mApi, this);
-        mAdapter = new MoviesAdapter(new ArrayList<Movie>(0), id -> mActions.openDetails(id));
+        initialize();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mActions.loadMovies();
+        mActions.loadItems(null);
     }
 
     @Nullable
@@ -66,6 +74,30 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movies, container, false);
         setupAdapter();
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+
+        inflater.inflate(R.menu.search_menu, menu);
+        MenuItem item = menu.findItem(R.id.search);
+        SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
+        MenuItemCompat.setActionView(item, searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mActions.loadItems(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                MyLog.info(MoviesFragment.class.getSimpleName(), newText);
+                return false;
+            }
+        });
     }
 
     @Override
@@ -78,12 +110,12 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     }
 
     @Override
-    public void showMovies(List<Movie> movies) {
+    public void showMovies(List<Content> movies) {
         mAdapter.replaceData(movies);
     }
 
     @Override
-    public void showMovieDetails(MovieDetail detail) {
+    public void showMovieDetails(ContentDetail detail) {
         Intent intent = new Intent(getContext(), DetailsActivity.class);
         intent.putExtra(DetailsActivity.MOVIE_EXTRA, detail);
         startActivity(intent);
@@ -94,11 +126,16 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 
+    private void initialize() {
+        mActions = new MoviesPresenter(mApi, this);
+        mAdapter = new ContentBrowseAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
+    }
+
     private void setupAdapter() {
         RecyclerView rv = mBinding.movieList;
         rv.setAdapter(mAdapter);
 
-        int numColumns = 1;
+        int numColumns = 3;
 
         rv.setHasFixedSize(true);
         rv.setLayoutManager(new GridLayoutManager(getContext(), numColumns));
@@ -109,6 +146,6 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
-        refreshLayout.setOnRefreshListener(() -> mActions.loadMovies());
+        refreshLayout.setOnRefreshListener(() -> mActions.loadItems(null));
     }
 }

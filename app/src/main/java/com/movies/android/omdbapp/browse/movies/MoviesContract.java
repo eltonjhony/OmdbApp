@@ -1,8 +1,8 @@
-package com.movies.android.omdbapp.movies;
+package com.movies.android.omdbapp.browse.movies;
 
 import com.android.annotations.NonNull;
-import com.movies.android.omdbapp.data.model.Movie;
-import com.movies.android.omdbapp.data.model.MovieDetail;
+import com.movies.android.omdbapp.data.model.Content;
+import com.movies.android.omdbapp.data.model.ContentDetail;
 
 import java.util.List;
 
@@ -15,15 +15,15 @@ public interface MoviesContract {
     interface View {
         void setLoading(boolean isActive);
 
-        void showMovies(List<Movie> movies);
+        void showMovies(List<Content> movies);
 
-        void showMovieDetails(MovieDetail movieDetail);
+        void showMovieDetails(ContentDetail contentDetail);
 
         void showError(String message);
     }
 
     interface Actions {
-        void loadMovies();
+        void loadItems(String query);
 
         void openDetails(@NonNull String id);
     }

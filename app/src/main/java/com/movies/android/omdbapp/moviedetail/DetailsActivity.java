@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.movies.android.omdbapp.R;
-import com.movies.android.omdbapp.data.model.MovieDetail;
+import com.movies.android.omdbapp.data.model.ContentDetail;
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -16,7 +16,7 @@ public class DetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
-        MovieDetail detail = (MovieDetail) getIntent().getSerializableExtra(MOVIE_EXTRA);
+        ContentDetail detail = (ContentDetail) getIntent().getSerializableExtra(MOVIE_EXTRA);
         Log.i(DetailsActivity.class.getSimpleName(), detail.toString());
     }
 }

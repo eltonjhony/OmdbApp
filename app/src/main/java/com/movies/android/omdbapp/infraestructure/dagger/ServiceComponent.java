@@ -1,6 +1,7 @@
 package com.movies.android.omdbapp.infraestructure.dagger;
 
-import com.movies.android.omdbapp.movies.MoviesFragment;
+import com.movies.android.omdbapp.browse.movies.MoviesFragment;
+import com.movies.android.omdbapp.browse.series.SeriesFragment;
 
 import dagger.Component;
 
@@ -11,4 +12,6 @@ import dagger.Component;
 public interface ServiceComponent {
 
     void inject(MoviesFragment moviesFragment);
+
+    void inject(SeriesFragment seriesFragment);
 }

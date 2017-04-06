@@ -1,10 +1,10 @@
-package com.movies.android.omdbapp.movies;
+package com.movies.android.omdbapp.browse.series;
 
 import com.android.annotations.NonNull;
+import com.movies.android.omdbapp.data.model.ContentDetail;
+import com.movies.android.omdbapp.data.model.DataResultWrapper;
 import com.movies.android.omdbapp.data.remote.ErrorHandler;
-import com.movies.android.omdbapp.data.model.MovieDetail;
-import com.movies.android.omdbapp.data.model.MovieResultWrapper;
-import com.movies.android.omdbapp.data.remote.MovieApi;
+import com.movies.android.omdbapp.data.remote.OmdbApi;
 import com.movies.android.omdbapp.infraestructure.MyLog;
 
 import rx.Observer;
@@ -15,22 +15,23 @@ import rx.schedulers.Schedulers;
  * Created by eltonjhony on 3/31/17.
  */
 
-public class MoviesPresenter implements MoviesContract.Actions {
+public class SeriesPresenter implements SeriesContract.Actions {
 
-    private MovieApi mApi;
-    private MoviesContract.View mView;
+    private OmdbApi mApi;
+    private SeriesContract.View mView;
 
-    public MoviesPresenter(MovieApi api, MoviesContract.View view) {
+    public SeriesPresenter(OmdbApi api, SeriesContract.View view) {
         this.mView = view;
         this.mApi = api;
     }
 
     @Override
-    public void loadMovies() {
+    public void loadItems(String query) {
+        final String searchText = query != null ? query : "Chicago";
         mView.setLoading(true);
-        mApi.fetch("star wars").subscribeOn(Schedulers.newThread())
+        mApi.fetch(searchText, "series").subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<MovieResultWrapper>() {
+                .subscribe(new Observer<DataResultWrapper>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -44,9 +45,9 @@ public class MoviesPresenter implements MoviesContract.Actions {
                     }
 
                     @Override
-                    public void onNext(MovieResultWrapper movieResultWrapper) {
+                    public void onNext(DataResultWrapper dataResultWrapper) {
                         mView.setLoading(false);
-                        mView.showMovies(movieResultWrapper.movies);
+                        mView.showSeries(dataResultWrapper.getData());
                     }
                 });
     }
@@ -56,7 +57,7 @@ public class MoviesPresenter implements MoviesContract.Actions {
         mView.setLoading(true);
         mApi.getById(id).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<MovieDetail>() {
+                .subscribe(new Observer<ContentDetail>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -70,9 +71,9 @@ public class MoviesPresenter implements MoviesContract.Actions {
                     }
 
                     @Override
-                    public void onNext(MovieDetail movieDetail) {
+                    public void onNext(ContentDetail contentDetail) {
                         mView.setLoading(false);
-                        mView.showMovieDetails(movieDetail);
+                        mView.showSeriesDetails(contentDetail);
                     }
                 });
     }

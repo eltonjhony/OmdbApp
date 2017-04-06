@@ -83,4 +83,5 @@ dependencies {
 
     androidTestCompile "com.android.support.test:runner:${runnerVersion}"
     androidTestCompile "com.android.support.test:rules:${rulesVersion}"
+    compile 'com.android.support:support-v4:23.4.0'
 }

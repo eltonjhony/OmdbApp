@@ -2,12 +2,12 @@ package com.movies.android.omdbapp;
 
 import android.util.Log;
 
-import com.movies.android.omdbapp.data.model.Movie;
-import com.movies.android.omdbapp.data.model.MovieResultWrapper;
-import com.movies.android.omdbapp.data.remote.MovieApi;
+import com.movies.android.omdbapp.data.model.Content;
+import com.movies.android.omdbapp.data.model.DataResultWrapper;
+import com.movies.android.omdbapp.data.remote.OmdbApi;
 import com.movies.android.omdbapp.infraestructure.MyLog;
-import com.movies.android.omdbapp.movies.MoviesContract;
-import com.movies.android.omdbapp.movies.MoviesPresenter;
+import com.movies.android.omdbapp.browse.movies.MoviesContract;
+import com.movies.android.omdbapp.browse.movies.MoviesPresenter;
 
 import org.junit.After;
 import org.junit.Before;
@@ -44,17 +44,17 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
 @PrepareForTest({MyLog.class, Log.class})
 public class MoviesPresenterTest {
 
-    private static List<Movie> MOVIES = new ArrayList<Movie>(){{
-        add(new Movie("1", "MOVIE A", "2015", ""));
-        add(new Movie("2", "MOVIE B", "2016", ""));
-        add(new Movie("3", "MOVIE C", "2017", ""));
-        add(new Movie("4", "MOVIE D", "2018", ""));
+    private static List<Content> MOVIES = new ArrayList<Content>(){{
+        add(new Content("1", "MOVIE A", "2015", ""));
+        add(new Content("2", "MOVIE B", "2016", ""));
+        add(new Content("3", "MOVIE C", "2017", ""));
+        add(new Content("4", "MOVIE D", "2018", ""));
     }};
 
-    private static MovieResultWrapper MOVIE_RESULT_DATA = new MovieResultWrapper(MOVIES);
+    private static DataResultWrapper MOVIE_RESULT_DATA = new DataResultWrapper(MOVIES);
 
     @Mock
-    private MovieApi mApi;
+    private OmdbApi mApi;
 
     @Mock
     private MoviesContract.View mView;
@@ -78,30 +78,30 @@ public class MoviesPresenterTest {
     public void loadMoviesAndPopulateScreen() {
 
         // When fetch API return mocked data from Backend
-        when(mApi.fetch(anyString())).thenReturn(Observable.just(MOVIE_RESULT_DATA));
+        when(mApi.fetch(anyString(), anyString())).thenReturn(Observable.just(MOVIE_RESULT_DATA));
 
         // When the presenter is called to load movies.
-        mPresenter.loadMovies();
+        mPresenter.loadItems();
 
         // Then, the loading should be called with true argument
         verify(mView, times(1)).setLoading(true);
 
         // Then, the fetch API should be called.
-        verify(mApi).fetch(anyString());
+        verify(mApi).fetch(anyString(), anyString());
 
         // the progress is hid and the movies is shown in the screen
         verify(mView, times(1)).setLoading(false);
-        verify(mView).showMovies(MOVIE_RESULT_DATA.movies);
+        verify(mView).showMovies(MOVIE_RESULT_DATA.getData());
     }
 
     @Test
     public void loadMoviesAndReceiveGenericError() throws Exception {
 
         // When fetch API return generic exception
-        when(mApi.fetch(anyString())).thenReturn(Observable.error(new Exception(GENERIC_MESSAGE)));
+        when(mApi.fetch(anyString(), anyString())).thenReturn(Observable.error(new Exception(GENERIC_MESSAGE)));
 
         // When the presenter is called to load movies.
-        mPresenter.loadMovies();
+        mPresenter.loadItems();
 
         // Then, the loading should be called with true argument
         verify(mView, times(1)).setLoading(true);
