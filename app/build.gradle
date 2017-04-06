@@ -24,13 +24,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             buildConfigField("int", "LOG_LEVEL", "0")
-            buildConfigField("String", "DEFAULT_HOST", "\"http://www.omdbapi.com/\"")
+            buildConfigField("String", "DEFAULT_HOST", "\"http://api.themoviedb.org/3/\"")
+            buildConfigField("String", "API_KEY", "\"1de4f2865be37bb3dc6c0fc2fc9e6b13\"")
         }
         debug {
             minifyEnabled false
 
             buildConfigField("int", "LOG_LEVEL", "4")
-            buildConfigField("String", "DEFAULT_HOST", "\"http://www.omdbapi.com/\"")
+            buildConfigField("String", "DEFAULT_HOST", "\"http://api.themoviedb.org/3/\"")
+            buildConfigField("String", "API_KEY", "\"1de4f2865be37bb3dc6c0fc2fc9e6b13\"")
         }
     }
     compileOptions {

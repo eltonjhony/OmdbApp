@@ -9,7 +9,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,17 +19,16 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.movies.android.omdbapp.R;
-import com.movies.android.omdbapp.data.model.Content;
 import com.movies.android.omdbapp.data.model.ContentDetail;
-import com.movies.android.omdbapp.data.remote.OmdbApi;
-import com.movies.android.omdbapp.databinding.EmptyListBinding;
+import com.movies.android.omdbapp.data.model.Serie;
+import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.databinding.FragmentSeriesBinding;
 import com.movies.android.omdbapp.infraestructure.MyApplication;
 import com.movies.android.omdbapp.infraestructure.MyLog;
 import com.movies.android.omdbapp.infraestructure.preferences.SearcherPreferences;
 import com.movies.android.omdbapp.main.MainActivity;
 import com.movies.android.omdbapp.moviedetail.DetailsActivity;
-import com.movies.android.omdbapp.browse.adapters.ContentBrowseAdapter;
+import com.movies.android.omdbapp.browse.adapters.SeriesAdapter;
 import com.movies.android.omdbapp.views.RecyclerViewWithEmptySupport;
 
 import org.parceler.Parcels;
@@ -47,10 +45,10 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
 
     private FragmentSeriesBinding mBinding;
     private SeriesContract.Actions mActions;
-    private ContentBrowseAdapter mAdapter;
+    private SeriesAdapter mAdapter;
 
     @Inject
-    OmdbApi mApi;
+    API mApi;
 
     @Inject
     SearcherPreferences mSearcherPreferences;
@@ -134,7 +132,7 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
     }
 
     @Override
-    public void showSeries(List<Content> series) {
+    public void showSeries(List<Serie> series) {
         mAdapter.replaceData(series);
     }
 
@@ -152,7 +150,7 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
 
     private void initialize() {
         mActions = new SeriesPresenter(mApi, this);
-        mAdapter = new ContentBrowseAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
+        mAdapter = new SeriesAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
     }
 
     private void setupAdapter() {

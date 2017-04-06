@@ -8,20 +8,23 @@ import java.util.List;
 /**
  * Created by eltonjhony on 3/31/17.
  */
-public class DataResultWrapper {
+public class DataResultWrapper<T> {
 
-    @SerializedName("Search")
-    private List<Content> content;
+    @SerializedName("page")
+    private int page;
+
+    @SerializedName("results")
+    private List<T> results;
 
     public DataResultWrapper() {
     }
 
-    public DataResultWrapper(List<Content> content) {
-        this.content = content;
+    public DataResultWrapper(List<T> results) {
+        this.results = results;
     }
 
-    public List<Content> getData() {
-        if (content == null) return new ArrayList<>();
-        return content;
+    public List<T> getData() {
+        if (results == null) return new ArrayList<>();
+        return results;
     }
 }

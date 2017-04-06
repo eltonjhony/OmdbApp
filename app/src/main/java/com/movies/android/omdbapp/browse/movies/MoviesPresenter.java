@@ -1,10 +1,14 @@
 package com.movies.android.omdbapp.browse.movies;
 
+import android.text.TextUtils;
+
 import com.android.annotations.NonNull;
+import com.movies.android.omdbapp.data.model.Movie;
+import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.data.remote.ErrorHandler;
 import com.movies.android.omdbapp.data.model.ContentDetail;
 import com.movies.android.omdbapp.data.model.DataResultWrapper;
-import com.movies.android.omdbapp.data.remote.OmdbApi;
+import com.movies.android.omdbapp.infraestructure.ApplicationConfiguration;
 import com.movies.android.omdbapp.infraestructure.MyLog;
 
 import rx.Observer;
@@ -17,21 +21,51 @@ import rx.schedulers.Schedulers;
 
 public class MoviesPresenter implements MoviesContract.Actions {
 
-    private OmdbApi mApi;
+    private API mApi;
     private MoviesContract.View mView;
 
-    public MoviesPresenter(OmdbApi api, MoviesContract.View view) {
+    public MoviesPresenter(API api, MoviesContract.View view) {
         this.mView = view;
         this.mApi = api;
     }
 
     @Override
     public void loadItems(String query) {
-        final String searchText = query != null ? query : "star wars";
+        if (TextUtils.isEmpty(query)) {
+            mView.setLoading(true);
+            mApi.fetchPopularMovies(ApplicationConfiguration.getApiKey()).subscribeOn(Schedulers.newThread())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Observer<DataResultWrapper<Movie>>() {
+                        @Override
+                        public void onCompleted() {
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            ErrorHandler.Error error = new ErrorHandler(e).extract();
+                            MyLog.error(error.code, error.message);
+                            mView.setLoading(false);
+                            mView.showError(error.message);
+                        }
+
+                        @Override
+                        public void onNext(DataResultWrapper<Movie> dataResultWrapper) {
+                            mView.setLoading(false);
+                            mView.showMovies(dataResultWrapper.getData());
+                        }
+                    });
+
+        } else {
+            searchMovies(query);
+        }
+    }
+
+    private void searchMovies(String query) {
         mView.setLoading(true);
-        mApi.fetch(searchText, "movie").subscribeOn(Schedulers.newThread())
+        mApi.searchMovies(ApplicationConfiguration.getApiKey(), query)
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<DataResultWrapper>() {
+                .subscribe(new Observer<DataResultWrapper<Movie>>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -45,7 +79,7 @@ public class MoviesPresenter implements MoviesContract.Actions {
                     }
 
                     @Override
-                    public void onNext(DataResultWrapper dataResultWrapper) {
+                    public void onNext(DataResultWrapper<Movie> dataResultWrapper) {
                         mView.setLoading(false);
                         mView.showMovies(dataResultWrapper.getData());
                     }

@@ -9,25 +9,20 @@ import java.io.Serializable;
  */
 public class Content implements Serializable {
 
-    @SerializedName("imdbID")
+    private static final String BASE_POSTER_URL = "http://image.tmdb.org/t/p/";
+    private static final String IMG_SIZE_185 = "w185";
+
+    @SerializedName("id")
     private String id;
 
-    @SerializedName("Title")
-    private String title;
-
-    @SerializedName("Year")
-    private String year;
-
-    @SerializedName("Poster")
+    @SerializedName("poster_path")
     private String posterUrl;
 
     public Content() {
     }
 
-    public Content(String id, String title, String year, String posterUrl) {
+    public Content(String id, String posterUrl) {
         this.id = id;
-        this.title = title;
-        this.year = year;
         this.posterUrl = posterUrl;
     }
 
@@ -35,15 +30,9 @@ public class Content implements Serializable {
         return id;
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public String getYear() {
-        return year;
-    }
-
     public String getPosterUrl() {
-        return posterUrl;
+        StringBuilder builder = new StringBuilder(BASE_POSTER_URL);
+        builder.append(IMG_SIZE_185).append("/").append(posterUrl);
+        return builder.toString();
     }
 }

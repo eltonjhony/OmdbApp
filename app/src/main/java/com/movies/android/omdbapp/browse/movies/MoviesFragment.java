@@ -19,16 +19,16 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.movies.android.omdbapp.R;
-import com.movies.android.omdbapp.data.model.Content;
+import com.movies.android.omdbapp.browse.adapters.MoviesAdapter;
 import com.movies.android.omdbapp.data.model.ContentDetail;
-import com.movies.android.omdbapp.data.remote.OmdbApi;
+import com.movies.android.omdbapp.data.model.Movie;
+import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.databinding.FragmentMoviesBinding;
 import com.movies.android.omdbapp.infraestructure.MyApplication;
 import com.movies.android.omdbapp.infraestructure.MyLog;
 import com.movies.android.omdbapp.infraestructure.preferences.SearcherPreferences;
 import com.movies.android.omdbapp.main.MainActivity;
 import com.movies.android.omdbapp.moviedetail.DetailsActivity;
-import com.movies.android.omdbapp.browse.adapters.ContentBrowseAdapter;
 import com.movies.android.omdbapp.views.RecyclerViewWithEmptySupport;
 
 import org.parceler.Parcels;
@@ -45,10 +45,10 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     private FragmentMoviesBinding mBinding;
     private MoviesContract.Actions mActions;
-    private ContentBrowseAdapter mAdapter;
+    private MoviesAdapter mAdapter;
 
     @Inject
-    OmdbApi mApi;
+    API mApi;
 
     @Inject
     SearcherPreferences mSearcherPreferences;
@@ -71,7 +71,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mActions.loadItems(mSearcherPreferences.getRecordedQuery());
+        mActions.loadItems(null);
     }
 
     @Nullable
@@ -132,7 +132,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     }
 
     @Override
-    public void showMovies(List<Content> movies) {
+    public void showMovies(List<Movie> movies) {
         mAdapter.replaceData(movies);
     }
 
@@ -150,7 +150,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     private void initialize() {
         mActions = new MoviesPresenter(mApi, this);
-        mAdapter = new ContentBrowseAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
+        mAdapter = new MoviesAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
     }
 
     private void setupAdapter() {

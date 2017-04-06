@@ -19,5 +19,6 @@ public class Constants {
 
     public interface ApplicationConfigurationParameter {
         String DEFAULT_HOST = "default_host";
+        String API_KEY = "api_key";
     }
 }

@@ -3,8 +3,10 @@ package com.movies.android.omdbapp.browse.series;
 import com.android.annotations.NonNull;
 import com.movies.android.omdbapp.data.model.ContentDetail;
 import com.movies.android.omdbapp.data.model.DataResultWrapper;
+import com.movies.android.omdbapp.data.model.Serie;
 import com.movies.android.omdbapp.data.remote.ErrorHandler;
-import com.movies.android.omdbapp.data.remote.OmdbApi;
+import com.movies.android.omdbapp.data.remote.API;
+import com.movies.android.omdbapp.infraestructure.ApplicationConfiguration;
 import com.movies.android.omdbapp.infraestructure.MyLog;
 
 import rx.Observer;
@@ -17,10 +19,10 @@ import rx.schedulers.Schedulers;
 
 public class SeriesPresenter implements SeriesContract.Actions {
 
-    private OmdbApi mApi;
+    private API mApi;
     private SeriesContract.View mView;
 
-    public SeriesPresenter(OmdbApi api, SeriesContract.View view) {
+    public SeriesPresenter(API api, SeriesContract.View view) {
         this.mView = view;
         this.mApi = api;
     }
@@ -29,9 +31,9 @@ public class SeriesPresenter implements SeriesContract.Actions {
     public void loadItems(String query) {
         final String searchText = query != null ? query : "Chicago";
         mView.setLoading(true);
-        mApi.fetch(searchText, "series").subscribeOn(Schedulers.newThread())
+        mApi.searchTvShows(ApplicationConfiguration.getApiKey(), searchText).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<DataResultWrapper>() {
+                .subscribe(new Observer<DataResultWrapper<Serie>>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -45,7 +47,7 @@ public class SeriesPresenter implements SeriesContract.Actions {
                     }
 
                     @Override
-                    public void onNext(DataResultWrapper dataResultWrapper) {
+                    public void onNext(DataResultWrapper<Serie> dataResultWrapper) {
                         mView.setLoading(false);
                         mView.showSeries(dataResultWrapper.getData());
                     }

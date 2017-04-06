@@ -9,6 +9,7 @@ import android.view.animation.AnimationUtils;
 
 import com.movies.android.omdbapp.R;
 import com.movies.android.omdbapp.data.model.Content;
+import com.movies.android.omdbapp.data.model.Serie;
 import com.movies.android.omdbapp.databinding.ContentItemBinding;
 import com.squareup.picasso.Picasso;
 
@@ -17,13 +18,13 @@ import java.util.List;
 /**
  * Created by eltonjhony on 3/31/17.
  */
-public class ContentBrowseAdapter extends RecyclerView.Adapter<ContentBrowseAdapter.ViewHolder> {
+public class SeriesAdapter extends RecyclerView.Adapter<SeriesAdapter.ViewHolder> {
 
-    private List<Content> mContent;
+    private List<Serie> mSeries;
     private OnContentItemClickListener mOnItemClickListener;
 
-    public ContentBrowseAdapter(List<Content> movies, OnContentItemClickListener listener) {
-        setList(movies);
+    public SeriesAdapter(List<Serie> series, OnContentItemClickListener listener) {
+        setList(series);
         this.mOnItemClickListener = listener;
     }
 
@@ -38,32 +39,32 @@ public class ContentBrowseAdapter extends RecyclerView.Adapter<ContentBrowseAdap
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Content content = mContent.get(position);
-        holder.update(content);
-        holder.setListeners(content);
+        Serie serie = mSeries.get(position);
+        holder.update(serie);
+        holder.setListeners(serie);
     }
 
     @Override
     public int getItemCount() {
-        return mContent.size();
+        return mSeries.size();
     }
 
-    public void replaceData(List<Content> contents) {
+    public void replaceData(List<Serie> contents) {
         setList(contents);
         notifyDataSetChanged();
     }
 
-    public void appendData(List<Content> contents) {
-        if (this.mContent == null) {
+    public void appendData(List<Serie> contents) {
+        if (this.mSeries == null) {
             replaceData(contents);
         } else {
-            this.mContent.addAll(contents);
-            notifyDataSetChanged();
+            this.mSeries.addAll(contents);
+
         }
     }
 
-    private void setList(List<Content> movies) {
-        mContent = movies;
+    private void setList(List<Serie> movies) {
+        mSeries = movies;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -75,9 +76,9 @@ public class ContentBrowseAdapter extends RecyclerView.Adapter<ContentBrowseAdap
             this.mLayout = binding;
         }
 
-        private void update(Content content) {
+        private void update(Serie serie) {
             Picasso.with(mLayout.movieThumbnail.getContext())
-                    .load(content.getPosterUrl())
+                    .load(serie.getPosterUrl())
                     .fit().centerCrop()
                     .placeholder(R.drawable.ic_insert_photo_black_48px)
                     .into(mLayout.movieThumbnail);

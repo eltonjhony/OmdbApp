@@ -4,7 +4,7 @@ import android.util.Log;
 
 import com.movies.android.omdbapp.data.model.Content;
 import com.movies.android.omdbapp.data.model.DataResultWrapper;
-import com.movies.android.omdbapp.data.remote.OmdbApi;
+import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.infraestructure.MyLog;
 import com.movies.android.omdbapp.browse.movies.MoviesContract;
 import com.movies.android.omdbapp.browse.movies.MoviesPresenter;
@@ -54,7 +54,7 @@ public class MoviesPresenterTest {
     private static DataResultWrapper MOVIE_RESULT_DATA = new DataResultWrapper(MOVIES);
 
     @Mock
-    private OmdbApi mApi;
+    private API mApi;
 
     @Mock
     private MoviesContract.View mView;
@@ -77,8 +77,8 @@ public class MoviesPresenterTest {
     @Test
     public void loadMoviesAndPopulateScreen() {
 
-        // When fetch API return mocked data from Backend
-        when(mApi.fetch(anyString(), anyString())).thenReturn(Observable.just(MOVIE_RESULT_DATA));
+        // When fetchPopularMovies API return mocked data from Backend
+        when(mApi.fetchPopularMovies(anyString(), anyString())).thenReturn(Observable.just(MOVIE_RESULT_DATA));
 
         // When the presenter is called to load movies.
         mPresenter.loadItems("test");
@@ -86,8 +86,8 @@ public class MoviesPresenterTest {
         // Then, the loading should be called with true argument
         verify(mView, times(1)).setLoading(true);
 
-        // Then, the fetch API should be called.
-        verify(mApi).fetch(anyString(), anyString());
+        // Then, the fetchPopularMovies API should be called.
+        verify(mApi).fetchPopularMovies(anyString(), anyString());
 
         // the progress is hid and the movies is shown in the screen
         verify(mView, times(1)).setLoading(false);
@@ -97,8 +97,8 @@ public class MoviesPresenterTest {
     @Test
     public void loadMoviesAndReceiveGenericError() throws Exception {
 
-        // When fetch API return generic exception
-        when(mApi.fetch(anyString(), anyString())).thenReturn(Observable.error(new Exception(GENERIC_MESSAGE)));
+        // When fetchPopularMovies API return generic exception
+        when(mApi.fetchPopularMovies(anyString(), anyString())).thenReturn(Observable.error(new Exception(GENERIC_MESSAGE)));
 
         // When the presenter is called to load movies.
         mPresenter.loadItems("test");

@@ -3,6 +3,7 @@ package com.movies.android.omdbapp.browse.series;
 import com.android.annotations.NonNull;
 import com.movies.android.omdbapp.data.model.Content;
 import com.movies.android.omdbapp.data.model.ContentDetail;
+import com.movies.android.omdbapp.data.model.Serie;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface SeriesContract {
     interface View {
         void setLoading(boolean isActive);
 
-        void showSeries(List<Content> movies);
+        void showSeries(List<Serie> movies);
 
         void showSeriesDetails(ContentDetail contentDetail);
 
