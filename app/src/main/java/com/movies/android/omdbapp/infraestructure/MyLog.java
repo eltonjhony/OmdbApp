@@ -1,9 +1,15 @@
 package com.movies.android.omdbapp.infraestructure;
 
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.movies.android.omdbapp.BuildConfig;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Created by eltonjhony on 4/4/17.
@@ -67,6 +73,33 @@ public class MyLog {
     public static void error(String message) {
         if (BuildConfig.LOG_LEVEL >= LOG_LEVEL_ERROR && !TextUtils.isEmpty(message)) {
             Log.e(DEFAULT_TAG, message);
+        }
+    }
+
+    /**
+     * Just for debug purpose
+     */
+    public static void logToFile(String message) {
+        if (!BuildConfig.DEBUG) {
+            return;
+        }
+
+        File log = new File(Environment.getExternalStorageDirectory(), "myAppLogFile.txt");
+        BufferedWriter out = null;
+        try {
+            out = new BufferedWriter(new FileWriter(log.getAbsolutePath(), log.exists()));
+            out.write(message);
+            out.close();
+        } catch (IOException e) {
+            // silent
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    // silent
+                }
+            }
         }
     }
 }
