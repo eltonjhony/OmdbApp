@@ -12,16 +12,26 @@ import com.movies.android.omdbapp.infraestructure.dagger.ServiceModule;
 
 public class MyApplication extends Application {
 
+    private static MyApplication myApplication;
     private static ServiceComponent serviceComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        setupGlobalContext();
         setupDIManager();
     }
 
     public static ServiceComponent getServiceComponent() {
         return serviceComponent;
+    }
+
+    public static MyApplication getMyApplication() {
+        return myApplication;
+    }
+
+    private void setupGlobalContext() {
+        myApplication = this;
     }
 
     private void setupDIManager() {

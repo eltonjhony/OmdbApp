@@ -26,9 +26,12 @@ import com.movies.android.omdbapp.data.remote.OmdbApi;
 import com.movies.android.omdbapp.databinding.FragmentSeriesBinding;
 import com.movies.android.omdbapp.infraestructure.MyApplication;
 import com.movies.android.omdbapp.infraestructure.MyLog;
+import com.movies.android.omdbapp.infraestructure.preferences.SearcherPreferences;
 import com.movies.android.omdbapp.main.MainActivity;
 import com.movies.android.omdbapp.moviedetail.DetailsActivity;
 import com.movies.android.omdbapp.browse.adapters.ContentBrowseAdapter;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +49,9 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
 
     @Inject
     OmdbApi mApi;
+
+    @Inject
+    SearcherPreferences mSearcherPreferences;
 
     public SeriesFragment() {
     }
@@ -88,6 +94,7 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                mSearcherPreferences.recordQuery(query);
                 mActions.loadItems(query);
                 return true;
             }
@@ -95,7 +102,22 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
             @Override
             public boolean onQueryTextChange(String newText) {
                 MyLog.info(SeriesFragment.class.getSimpleName(), newText);
-                return false;
+                return true;
+            }
+        });
+        MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.search:
+                        mSearcherPreferences.clear();
+                }
+                return true;
             }
         });
     }
@@ -117,7 +139,7 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
     @Override
     public void showSeriesDetails(ContentDetail detail) {
         Intent intent = new Intent(getContext(), DetailsActivity.class);
-        intent.putExtra(DetailsActivity.MOVIE_EXTRA, detail);
+        intent.putExtra(DetailsActivity.MOVIE_EXTRA, Parcels.wrap(detail));
         startActivity(intent);
     }
 
@@ -146,6 +168,8 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
-        refreshLayout.setOnRefreshListener(() -> mActions.loadItems(null));
+        refreshLayout.setOnRefreshListener(() -> {
+            mActions.loadItems(mSearcherPreferences.getRecordedQuery());
+        });
     }
 }

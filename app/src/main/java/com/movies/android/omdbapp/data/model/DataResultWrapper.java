@@ -11,7 +11,7 @@ import java.util.List;
 public class DataResultWrapper {
 
     @SerializedName("Search")
-    public List<Content> content;
+    private List<Content> content;
 
     public DataResultWrapper() {
     }

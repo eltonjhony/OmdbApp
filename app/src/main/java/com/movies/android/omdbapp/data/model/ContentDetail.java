@@ -3,63 +3,62 @@ package com.movies.android.omdbapp.data.model;
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-
-import java.io.Serializable;
+import org.parceler.Parcel;
 import java.util.List;
 
 /**
  * Created by eltonjhony on 4/3/17.
  */
-
-public class ContentDetail implements Serializable {
+@Parcel
+public class ContentDetail {
 
     @SerializedName("Title")
-    private String title;
+    public String title;
 
     @SerializedName("Year")
-    private String year;
+    public String year;
 
     @SerializedName("Rated")
-    private String rated;
+    public String rated;
 
     @SerializedName("Released")
-    private String released;
+    public String released;
 
     @SerializedName("Runtime")
-    private String runtime;
+    public String runtime;
 
     @SerializedName("Genre")
-    private String genre;
+    public String genre;
 
     @SerializedName("Director")
-    private String director;
+    public String director;
 
     @SerializedName("Awards")
-    private String awards;
+    public String awards;
 
     @SerializedName("Poster")
-    private String poster;
+    public String poster;
 
     @SerializedName("Language")
-    private String language;
+    public String language;
 
     @SerializedName("Country")
-    private String country;
+    public String country;
 
     @SerializedName("Ratings")
-    private List<Rating> ratings;
+    public List<Rating> ratings;
 
     @SerializedName("imdbRating")
-    private String imdbRating;
+    public String imdbRating;
 
     @SerializedName("Type")
-    private String type;
+    public String type;
 
     @SerializedName("Production")
-    private String production;
+    public String production;
 
     @SerializedName("Website")
-    private String website;
+    public String website;
 
     public ContentDetail() {
     }
@@ -84,70 +83,6 @@ public class ContentDetail implements Serializable {
         this.type = type;
         this.production = production;
         this.website = website;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getYear() {
-        return year;
-    }
-
-    public String getRated() {
-        return rated;
-    }
-
-    public String getReleased() {
-        return released;
-    }
-
-    public String getRuntime() {
-        return runtime;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public String getDirector() {
-        return director;
-    }
-
-    public String getAwards() {
-        return awards;
-    }
-
-    public String getPoster() {
-        return poster;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public List<Rating> getRatings() {
-        return ratings;
-    }
-
-    public String getImdbRating() {
-        return imdbRating;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getProduction() {
-        return production;
-    }
-
-    public String getWebsite() {
-        return website;
     }
 
     @Override

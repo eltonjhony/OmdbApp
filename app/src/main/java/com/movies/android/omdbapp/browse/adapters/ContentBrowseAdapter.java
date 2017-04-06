@@ -68,7 +68,7 @@ public class ContentBrowseAdapter extends RecyclerView.Adapter<ContentBrowseAdap
 
         private void update(Content content) {
             Picasso.with(mLayout.movieThumbnail.getContext())
-                    .load(content.posterUrl)
+                    .load(content.getPosterUrl())
                     .fit().centerCrop()
                     .placeholder(R.drawable.ic_insert_photo_black_48px)
                     .into(mLayout.movieThumbnail);
@@ -77,7 +77,7 @@ public class ContentBrowseAdapter extends RecyclerView.Adapter<ContentBrowseAdap
         private void setListeners(final Content content) {
             itemView.setOnClickListener(v -> {
                 v.startAnimation(AnimationUtils.loadAnimation(v.getContext(), R.anim.image_click));
-                mOnItemClickListener.onClicked(content.id);
+                mOnItemClickListener.onClicked(content.getId());
             });
         }
     }

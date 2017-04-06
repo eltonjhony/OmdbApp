@@ -11,16 +11,16 @@ import java.io.Serializable;
 public class Content implements Serializable {
 
     @SerializedName("imdbID")
-    public String id;
+    private String id;
 
     @SerializedName("Title")
-    public String title;
+    private String title;
 
     @SerializedName("Year")
-    public String year;
+    private String year;
 
     @SerializedName("Poster")
-    public String posterUrl;
+    private String posterUrl;
 
     public Content() {
     }

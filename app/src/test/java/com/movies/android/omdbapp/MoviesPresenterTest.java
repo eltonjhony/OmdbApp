@@ -81,7 +81,7 @@ public class MoviesPresenterTest {
         when(mApi.fetch(anyString(), anyString())).thenReturn(Observable.just(MOVIE_RESULT_DATA));
 
         // When the presenter is called to load movies.
-        mPresenter.loadItems();
+        mPresenter.loadItems("test");
 
         // Then, the loading should be called with true argument
         verify(mView, times(1)).setLoading(true);
@@ -101,7 +101,7 @@ public class MoviesPresenterTest {
         when(mApi.fetch(anyString(), anyString())).thenReturn(Observable.error(new Exception(GENERIC_MESSAGE)));
 
         // When the presenter is called to load movies.
-        mPresenter.loadItems();
+        mPresenter.loadItems("test");
 
         // Then, the loading should be called with true argument
         verify(mView, times(1)).setLoading(true);

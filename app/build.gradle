@@ -48,6 +48,8 @@ dependencies {
     final rxJavaVersion = '1.1.6'
     final annotationVersion = '1.0'
     final converterVersion = '2.0.0'
+    final parcelerVersion = '1.1.6'
+    final loggingInterceptorVersion = '3.2.0'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -72,6 +74,10 @@ dependencies {
     compile "io.reactivex:rxjava:${rxJavaVersion}"
     compile "com.squareup.retrofit2:adapter-rxjava:${retrofitVersion}"
     compile "com.squareup.retrofit2:converter-gson:${converterVersion}"
+    compile "com.squareup.okhttp3:logging-interceptor:${loggingInterceptorVersion}"
+    compile "org.parceler:parceler-api:${parcelerVersion}"
+
+    annotationProcessor "org.parceler:parceler:${parcelerVersion}"
 
     provided "com.google.dagger:dagger-compiler:${daggerVersion}"
 
@@ -83,5 +89,4 @@ dependencies {
 
     androidTestCompile "com.android.support.test:runner:${runnerVersion}"
     androidTestCompile "com.android.support.test:rules:${rulesVersion}"
-    compile 'com.android.support:support-v4:23.4.0'
 }
