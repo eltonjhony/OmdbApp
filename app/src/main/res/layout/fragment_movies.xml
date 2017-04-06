@@ -1,13 +1,27 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/movie_list"
+        <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <com.movies.android.omdbapp.views.RecyclerViewWithEmptySupport
+                android:id="@+id/movie_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <include android:id="@+id/empty_layout"
+                layout="@layout/empty_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
 
     </android.support.v4.widget.SwipeRefreshLayout>
+
 </layout>

@@ -48,9 +48,18 @@ public class ContentBrowseAdapter extends RecyclerView.Adapter<ContentBrowseAdap
         return mContent.size();
     }
 
-    public void replaceData(List<Content> movies) {
-        setList(movies);
+    public void replaceData(List<Content> contents) {
+        setList(contents);
         notifyDataSetChanged();
+    }
+
+    public void appendData(List<Content> contents) {
+        if (this.mContent == null) {
+            replaceData(contents);
+        } else {
+            this.mContent.addAll(contents);
+            notifyDataSetChanged();
+        }
     }
 
     private void setList(List<Content> movies) {

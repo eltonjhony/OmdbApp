@@ -6,4 +6,5 @@
     <string name="movies_label">Movies</string>
     <string name="series_label">Series</string>
     <string name="search_hint">Find anything</string>
+    <string name="data_not_found">Data not found</string>
 </resources>

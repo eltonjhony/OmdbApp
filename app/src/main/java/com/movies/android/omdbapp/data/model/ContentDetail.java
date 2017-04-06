@@ -13,52 +13,52 @@ import java.util.List;
 public class ContentDetail {
 
     @SerializedName("Title")
-    public String title;
+    String title;
 
     @SerializedName("Year")
-    public String year;
+    String year;
 
     @SerializedName("Rated")
-    public String rated;
+    String rated;
 
     @SerializedName("Released")
-    public String released;
+    String released;
 
     @SerializedName("Runtime")
-    public String runtime;
+    String runtime;
 
     @SerializedName("Genre")
-    public String genre;
+    String genre;
 
     @SerializedName("Director")
-    public String director;
+    String director;
 
     @SerializedName("Awards")
-    public String awards;
+    String awards;
 
     @SerializedName("Poster")
-    public String poster;
+    String poster;
 
     @SerializedName("Language")
-    public String language;
+    String language;
 
     @SerializedName("Country")
-    public String country;
+    String country;
 
     @SerializedName("Ratings")
-    public List<Rating> ratings;
+    List<Rating> ratings;
 
     @SerializedName("imdbRating")
-    public String imdbRating;
+    String imdbRating;
 
     @SerializedName("Type")
-    public String type;
+    String type;
 
     @SerializedName("Production")
-    public String production;
+    String production;
 
     @SerializedName("Website")
-    public String website;
+    String website;
 
     public ContentDetail() {
     }

@@ -23,6 +23,7 @@ import com.movies.android.omdbapp.R;
 import com.movies.android.omdbapp.data.model.Content;
 import com.movies.android.omdbapp.data.model.ContentDetail;
 import com.movies.android.omdbapp.data.remote.OmdbApi;
+import com.movies.android.omdbapp.databinding.EmptyListBinding;
 import com.movies.android.omdbapp.databinding.FragmentSeriesBinding;
 import com.movies.android.omdbapp.infraestructure.MyApplication;
 import com.movies.android.omdbapp.infraestructure.MyLog;
@@ -30,6 +31,7 @@ import com.movies.android.omdbapp.infraestructure.preferences.SearcherPreference
 import com.movies.android.omdbapp.main.MainActivity;
 import com.movies.android.omdbapp.moviedetail.DetailsActivity;
 import com.movies.android.omdbapp.browse.adapters.ContentBrowseAdapter;
+import com.movies.android.omdbapp.views.RecyclerViewWithEmptySupport;
 
 import org.parceler.Parcels;
 
@@ -71,7 +73,7 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mActions.loadItems(null);
+        mActions.loadItems(mSearcherPreferences.getRecordedQuery());
     }
 
     @Nullable
@@ -132,8 +134,8 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
     }
 
     @Override
-    public void showSeries(List<Content> movies) {
-        mAdapter.replaceData(movies);
+    public void showSeries(List<Content> series) {
+        mAdapter.replaceData(series);
     }
 
     @Override
@@ -154,13 +156,14 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
     }
 
     private void setupAdapter() {
-        RecyclerView rv = mBinding.movieList;
+        RecyclerViewWithEmptySupport rv = mBinding.seriesList;
         rv.setAdapter(mAdapter);
 
         int numColumns = 3;
 
         rv.setHasFixedSize(true);
         rv.setLayoutManager(new GridLayoutManager(getContext(), numColumns));
+        rv.setEmptyView(mBinding.emptyLayout.getRoot());
 
         SwipeRefreshLayout refreshLayout = mBinding.refreshLayout;
         refreshLayout.setColorSchemeColors(

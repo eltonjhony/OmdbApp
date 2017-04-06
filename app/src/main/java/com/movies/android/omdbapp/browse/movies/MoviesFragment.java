@@ -9,7 +9,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -30,6 +29,7 @@ import com.movies.android.omdbapp.infraestructure.preferences.SearcherPreference
 import com.movies.android.omdbapp.main.MainActivity;
 import com.movies.android.omdbapp.moviedetail.DetailsActivity;
 import com.movies.android.omdbapp.browse.adapters.ContentBrowseAdapter;
+import com.movies.android.omdbapp.views.RecyclerViewWithEmptySupport;
 
 import org.parceler.Parcels;
 
@@ -71,7 +71,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mActions.loadItems(null);
+        mActions.loadItems(mSearcherPreferences.getRecordedQuery());
     }
 
     @Nullable
@@ -154,13 +154,14 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     }
 
     private void setupAdapter() {
-        RecyclerView rv = mBinding.movieList;
+        RecyclerViewWithEmptySupport rv = mBinding.movieList;
         rv.setAdapter(mAdapter);
 
         int numColumns = 3;
 
         rv.setHasFixedSize(true);
         rv.setLayoutManager(new GridLayoutManager(getContext(), numColumns));
+        rv.setEmptyView(mBinding.emptyLayout.getRoot());
 
         SwipeRefreshLayout refreshLayout = mBinding.refreshLayout;
         refreshLayout.setColorSchemeColors(

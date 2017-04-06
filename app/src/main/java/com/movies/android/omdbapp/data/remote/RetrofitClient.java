@@ -4,10 +4,12 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.movies.android.omdbapp.BuildConfig;
 import com.movies.android.omdbapp.infraestructure.ApplicationConfiguration;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
+import okhttp3.logging.HttpLoggingInterceptor.Level;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -35,8 +37,14 @@ public class RetrofitClient {
 
     @NonNull
     private static HttpLoggingInterceptor setupLogInterceptor() {
+        Level level;
+        if (BuildConfig.DEBUG) {
+            level = Level.BODY;
+        } else {
+            level = Level.NONE;
+        }
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+        logging.setLevel(level);
         return logging;
     }
 }
