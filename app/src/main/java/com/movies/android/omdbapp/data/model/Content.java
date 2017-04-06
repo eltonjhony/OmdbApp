@@ -7,7 +7,6 @@ import java.io.Serializable;
 /**
  * Created by eltonjhony on 3/31/17.
  */
-
 public class Content implements Serializable {
 
     @SerializedName("imdbID")

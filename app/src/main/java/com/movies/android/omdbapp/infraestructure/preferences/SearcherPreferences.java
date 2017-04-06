@@ -3,36 +3,32 @@ package com.movies.android.omdbapp.infraestructure.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.movies.android.omdbapp.infraestructure.Constants;
+
 /**
  * Created by eltonjhony on 4/6/17.
  */
 public class SearcherPreferences {
 
-    private static final String SEARCHER_PREF_KEY = "searcher_pref";
-    private static final String SEARCH_TEXT_KEY = "SEARCH_TEXT";
-
-    private Context mContext;
+    private SharedPreferences mPreferences;
 
     public SearcherPreferences(Context context) {
-        mContext = context;
+        mPreferences = context.getSharedPreferences(Constants.PreferenceKeys.SEARCHER, Context.MODE_PRIVATE);
     }
 
     public void recordQuery(String query) {
-        SharedPreferences preferences = mContext.getSharedPreferences(SEARCHER_PREF_KEY, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(SEARCH_TEXT_KEY, query);
+        SharedPreferences.Editor editor = mPreferences.edit();
+        editor.putString(Constants.PreferenceKeys.SEARCH_TEXT, query);
         editor.apply();
     }
 
     public String getRecordedQuery() {
-        SharedPreferences preferences = mContext.getSharedPreferences(SEARCHER_PREF_KEY, Context.MODE_PRIVATE);
-        String query = preferences.getString(SEARCH_TEXT_KEY, null);
+        String query = mPreferences.getString(Constants.PreferenceKeys.SEARCH_TEXT, null);
         return query;
     }
 
     public void clear() {
-        SharedPreferences preferences = mContext.getSharedPreferences(SEARCHER_PREF_KEY, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
+        SharedPreferences.Editor editor = mPreferences.edit();
         editor.clear();
         editor.apply();
     }

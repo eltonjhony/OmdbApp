@@ -22,6 +22,15 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField("int", "LOG_LEVEL", "0")
+            buildConfigField("String", "DEFAULT_HOST", "\"http://www.omdbapi.com/\"")
+        }
+        debug {
+            minifyEnabled false
+
+            buildConfigField("int", "LOG_LEVEL", "4")
+            buildConfigField("String", "DEFAULT_HOST", "\"http://www.omdbapi.com/\"")
         }
     }
     compileOptions {
