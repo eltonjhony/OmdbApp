@@ -4,9 +4,9 @@ import android.text.TextUtils;
 
 import com.android.annotations.NonNull;
 import com.movies.android.omdbapp.data.model.Movie;
+import com.movies.android.omdbapp.data.model.MovieDetail;
 import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.data.remote.ErrorHandler;
-import com.movies.android.omdbapp.data.model.ContentDetail;
 import com.movies.android.omdbapp.data.model.DataResultWrapper;
 import com.movies.android.omdbapp.infraestructure.ApplicationConfiguration;
 import com.movies.android.omdbapp.infraestructure.MyLog;
@@ -89,9 +89,9 @@ public class MoviesPresenter implements MoviesContract.Actions {
     @Override
     public void openDetails(@NonNull String id) {
         mView.setLoading(true);
-        mApi.getById(id).subscribeOn(Schedulers.newThread())
+        mApi.getMovieById(id, ApplicationConfiguration.getApiKey()).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<ContentDetail>() {
+                .subscribe(new Observer<MovieDetail>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -105,9 +105,9 @@ public class MoviesPresenter implements MoviesContract.Actions {
                     }
 
                     @Override
-                    public void onNext(ContentDetail contentDetail) {
+                    public void onNext(MovieDetail movieDetail) {
                         mView.setLoading(false);
-                        mView.showMovieDetails(contentDetail);
+                        mView.showMovieDetails(movieDetail);
                     }
                 });
     }

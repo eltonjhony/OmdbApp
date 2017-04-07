@@ -1,9 +1,10 @@
 package com.movies.android.omdbapp;
 
+import android.text.TextUtils;
 import android.util.Log;
 
-import com.movies.android.omdbapp.data.model.Content;
 import com.movies.android.omdbapp.data.model.DataResultWrapper;
+import com.movies.android.omdbapp.data.model.Movie;
 import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.infraestructure.MyLog;
 import com.movies.android.omdbapp.browse.movies.MoviesContract;
@@ -41,14 +42,14 @@ import static org.powermock.api.mockito.PowerMockito.verifyStatic;
  */
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({MyLog.class, Log.class})
+@PrepareForTest({MyLog.class, Log.class, TextUtils.class})
 public class MoviesPresenterTest {
 
-    private static List<Content> MOVIES = new ArrayList<Content>(){{
-        add(new Content("1", "MOVIE A", "2015", ""));
-        add(new Content("2", "MOVIE B", "2016", ""));
-        add(new Content("3", "MOVIE C", "2017", ""));
-        add(new Content("4", "MOVIE D", "2018", ""));
+    private static List<Movie> MOVIES = new ArrayList<Movie>(){{
+        add(new Movie("1", "MOVIE A", "2015"));
+        add(new Movie("2", "MOVIE B", "2016"));
+        add(new Movie("3", "MOVIE C", "2017"));
+        add(new Movie("4", "MOVIE D", "2018"));
     }};
 
     private static DataResultWrapper MOVIE_RESULT_DATA = new DataResultWrapper(MOVIES);
@@ -64,7 +65,7 @@ public class MoviesPresenterTest {
     @Before
     public void setupMoviesPresenter() {
         MockitoAnnotations.initMocks(this);
-        PowerMockito.mockStatic(MyLog.class, Log.class);
+        PowerMockito.mockStatic(MyLog.class, Log.class, TextUtils.class);
         mPresenter = new MoviesPresenter(mApi, mView);
         RxAndroidPlugins.getInstance().registerSchedulersHook(new RxAndroidSchedulersHook() {
             @Override
@@ -75,10 +76,13 @@ public class MoviesPresenterTest {
     }
 
     @Test
-    public void loadMoviesAndPopulateScreen() {
+    public void loadPopularMoviesAndPopulateScreen() {
 
         // When fetchPopularMovies API return mocked data from Backend
-        when(mApi.fetchPopularMovies(anyString(), anyString())).thenReturn(Observable.just(MOVIE_RESULT_DATA));
+        when(mApi.fetchPopularMovies(anyString())).thenReturn(Observable.just(MOVIE_RESULT_DATA));
+
+        // Mock textUtils verification to start fetch popular movies
+        PowerMockito.when(TextUtils.isEmpty(anyString())).thenReturn(true);
 
         // When the presenter is called to load movies.
         mPresenter.loadItems("test");
@@ -87,7 +91,7 @@ public class MoviesPresenterTest {
         verify(mView, times(1)).setLoading(true);
 
         // Then, the fetchPopularMovies API should be called.
-        verify(mApi).fetchPopularMovies(anyString(), anyString());
+        verify(mApi).fetchPopularMovies(anyString());
 
         // the progress is hid and the movies is shown in the screen
         verify(mView, times(1)).setLoading(false);
@@ -95,10 +99,13 @@ public class MoviesPresenterTest {
     }
 
     @Test
-    public void loadMoviesAndReceiveGenericError() throws Exception {
+    public void loadPopularMoviesAndReceiveGenericError() throws Exception {
 
         // When fetchPopularMovies API return generic exception
-        when(mApi.fetchPopularMovies(anyString(), anyString())).thenReturn(Observable.error(new Exception(GENERIC_MESSAGE)));
+        when(mApi.fetchPopularMovies(anyString())).thenReturn(Observable.error(new Exception(GENERIC_MESSAGE)));
+
+        // Mock textUtils verification to start fetch popular movies
+        PowerMockito.when(TextUtils.isEmpty(anyString())).thenReturn(true);
 
         // When the presenter is called to load movies.
         mPresenter.loadItems("test");

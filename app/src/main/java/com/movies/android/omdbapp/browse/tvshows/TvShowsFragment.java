@@ -1,4 +1,4 @@
-package com.movies.android.omdbapp.browse.series;
+package com.movies.android.omdbapp.browse.tvshows;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -19,16 +19,16 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.movies.android.omdbapp.R;
-import com.movies.android.omdbapp.data.model.ContentDetail;
-import com.movies.android.omdbapp.data.model.Serie;
+import com.movies.android.omdbapp.browse.adapters.BrowseBaseAdapter;
+import com.movies.android.omdbapp.data.model.TvShows;
+import com.movies.android.omdbapp.data.model.TvShowsDetail;
 import com.movies.android.omdbapp.data.remote.API;
-import com.movies.android.omdbapp.databinding.FragmentSeriesBinding;
+import com.movies.android.omdbapp.databinding.FragmentTvShowsBinding;
 import com.movies.android.omdbapp.infraestructure.MyApplication;
 import com.movies.android.omdbapp.infraestructure.MyLog;
 import com.movies.android.omdbapp.infraestructure.preferences.SearcherPreferences;
 import com.movies.android.omdbapp.main.MainActivity;
-import com.movies.android.omdbapp.moviedetail.DetailsActivity;
-import com.movies.android.omdbapp.browse.adapters.SeriesAdapter;
+import com.movies.android.omdbapp.details.DetailsActivity;
 import com.movies.android.omdbapp.views.RecyclerViewWithEmptySupport;
 
 import org.parceler.Parcels;
@@ -41,11 +41,11 @@ import javax.inject.Inject;
 /**
  * Created by eltonjhony on 3/31/17.
  */
-public class SeriesFragment extends Fragment implements SeriesContract.View {
+public class TvShowsFragment extends Fragment implements TvShowsContract.View {
 
-    private FragmentSeriesBinding mBinding;
-    private SeriesContract.Actions mActions;
-    private SeriesAdapter mAdapter;
+    private FragmentTvShowsBinding mBinding;
+    private TvShowsContract.Actions mActions;
+    private BrowseBaseAdapter mAdapter;
 
     @Inject
     API mApi;
@@ -53,11 +53,11 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
     @Inject
     SearcherPreferences mSearcherPreferences;
 
-    public SeriesFragment() {
+    public TvShowsFragment() {
     }
 
-    public static SeriesFragment newInstance() {
-        return new SeriesFragment();
+    public static TvShowsFragment newInstance() {
+        return new TvShowsFragment();
     }
 
     @Override
@@ -77,7 +77,7 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_series, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_tv_shows, container, false);
         setupAdapter();
         return mBinding.getRoot();
     }
@@ -101,7 +101,7 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                MyLog.info(SeriesFragment.class.getSimpleName(), newText);
+                MyLog.info(TvShowsFragment.class.getSimpleName(), newText);
                 return true;
             }
         });
@@ -132,14 +132,14 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
     }
 
     @Override
-    public void showSeries(List<Serie> series) {
-        mAdapter.replaceData(series);
+    public void displayTvShows(List<TvShows> tvShows) {
+        mAdapter.replaceData(tvShows);
     }
 
     @Override
-    public void showSeriesDetails(ContentDetail detail) {
+    public void displayTvShowsDetails(TvShowsDetail detail) {
         Intent intent = new Intent(getContext(), DetailsActivity.class);
-        intent.putExtra(DetailsActivity.MOVIE_EXTRA, Parcels.wrap(detail));
+        intent.putExtra(DetailsActivity.TV_SHOW_EXTRA, Parcels.wrap(detail));
         startActivity(intent);
     }
 
@@ -149,15 +149,15 @@ public class SeriesFragment extends Fragment implements SeriesContract.View {
     }
 
     private void initialize() {
-        mActions = new SeriesPresenter(mApi, this);
-        mAdapter = new SeriesAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
+        mActions = new TvShowsPresenter(mApi, this);
+        mAdapter = new BrowseBaseAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
     }
 
     private void setupAdapter() {
         RecyclerViewWithEmptySupport rv = mBinding.seriesList;
         rv.setAdapter(mAdapter);
 
-        int numColumns = 3;
+        final int numColumns = 3;
 
         rv.setHasFixedSize(true);
         rv.setLayoutManager(new GridLayoutManager(getContext(), numColumns));

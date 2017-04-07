@@ -7,15 +7,15 @@ import java.io.Serializable;
 /**
  * Created by eltonjhony on 4/6/17.
  */
-public class Serie extends Content implements Serializable {
+public class TvShows extends Content implements Serializable {
 
     @SerializedName("name")
     private String name;
 
-    public Serie() {
+    public TvShows() {
     }
 
-    public Serie(String id, String posterUrl, String name) {
+    public TvShows(String id, String posterUrl, String name) {
         super(id, posterUrl);
         this.name = name;
     }

@@ -1,9 +1,9 @@
-package com.movies.android.omdbapp.browse.series;
+package com.movies.android.omdbapp.browse.tvshows;
 
 import com.android.annotations.NonNull;
-import com.movies.android.omdbapp.data.model.ContentDetail;
 import com.movies.android.omdbapp.data.model.DataResultWrapper;
-import com.movies.android.omdbapp.data.model.Serie;
+import com.movies.android.omdbapp.data.model.TvShows;
+import com.movies.android.omdbapp.data.model.TvShowsDetail;
 import com.movies.android.omdbapp.data.remote.ErrorHandler;
 import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.infraestructure.ApplicationConfiguration;
@@ -17,23 +17,24 @@ import rx.schedulers.Schedulers;
  * Created by eltonjhony on 3/31/17.
  */
 
-public class SeriesPresenter implements SeriesContract.Actions {
+public class TvShowsPresenter implements TvShowsContract.Actions {
 
     private API mApi;
-    private SeriesContract.View mView;
+    private TvShowsContract.View mView;
 
-    public SeriesPresenter(API api, SeriesContract.View view) {
+    public TvShowsPresenter(API api, TvShowsContract.View view) {
         this.mView = view;
         this.mApi = api;
     }
 
     @Override
     public void loadItems(String query) {
-        final String searchText = query != null ? query : "Chicago";
+        final String searchText = query != null ? query : "Chicago"; //TODO To improve this!
         mView.setLoading(true);
-        mApi.searchTvShows(ApplicationConfiguration.getApiKey(), searchText).subscribeOn(Schedulers.newThread())
+        mApi.searchTvShows(ApplicationConfiguration.getApiKey(), searchText)
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<DataResultWrapper<Serie>>() {
+                .subscribe(new Observer<DataResultWrapper<TvShows>>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -47,9 +48,9 @@ public class SeriesPresenter implements SeriesContract.Actions {
                     }
 
                     @Override
-                    public void onNext(DataResultWrapper<Serie> dataResultWrapper) {
+                    public void onNext(DataResultWrapper<TvShows> dataResultWrapper) {
                         mView.setLoading(false);
-                        mView.showSeries(dataResultWrapper.getData());
+                        mView.displayTvShows(dataResultWrapper.getData());
                     }
                 });
     }
@@ -57,9 +58,10 @@ public class SeriesPresenter implements SeriesContract.Actions {
     @Override
     public void openDetails(@NonNull String id) {
         mView.setLoading(true);
-        mApi.getById(id).subscribeOn(Schedulers.newThread())
+        mApi.getTvShowById(id, ApplicationConfiguration.getApiKey())
+                .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<ContentDetail>() {
+                .subscribe(new Observer<TvShowsDetail>() {
                     @Override
                     public void onCompleted() {
                     }
@@ -73,9 +75,9 @@ public class SeriesPresenter implements SeriesContract.Actions {
                     }
 
                     @Override
-                    public void onNext(ContentDetail contentDetail) {
+                    public void onNext(TvShowsDetail tvShowsDetail) {
                         mView.setLoading(false);
-                        mView.showSeriesDetails(contentDetail);
+                        mView.displayTvShowsDetails(tvShowsDetail);
                     }
                 });
     }

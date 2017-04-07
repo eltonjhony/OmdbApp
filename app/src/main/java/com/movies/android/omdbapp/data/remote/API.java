@@ -1,11 +1,13 @@
 package com.movies.android.omdbapp.data.remote;
 
-import com.movies.android.omdbapp.data.model.ContentDetail;
 import com.movies.android.omdbapp.data.model.DataResultWrapper;
 import com.movies.android.omdbapp.data.model.Movie;
-import com.movies.android.omdbapp.data.model.Serie;
+import com.movies.android.omdbapp.data.model.MovieDetail;
+import com.movies.android.omdbapp.data.model.TvShows;
+import com.movies.android.omdbapp.data.model.TvShowsDetail;
 
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 
@@ -16,14 +18,17 @@ import rx.Observable;
 public interface API {
 
     @GET("./movie/popular")
-    Observable<DataResultWrapper<Movie>> fetchPopularMovies(@Query("api_key") String api_key);
+    Observable<DataResultWrapper<Movie>> fetchPopularMovies(@Query("api_key") String apiKey);
 
     @GET("./search/movie")
-    Observable<DataResultWrapper<Movie>> searchMovies(@Query("api_key") String api_key, @Query("query") String query);
+    Observable<DataResultWrapper<Movie>> searchMovies(@Query("api_key") String apiKey, @Query("query") String query);
 
     @GET("./search/tv")
-    Observable<DataResultWrapper<Serie>> searchTvShows(@Query("api_key") String api_key, @Query("query") String query);
+    Observable<DataResultWrapper<TvShows>> searchTvShows(@Query("api_key") String apiKey, @Query("query") String query);
 
-    @GET("./")
-    Observable<ContentDetail> getById(@Query("i") String id);
+    @GET("./movie/{movieId}")
+    Observable<MovieDetail> getMovieById(@Path("movieId") String movieId, @Query("api_key") String apiKey);
+
+    @GET("./tv/{tvId}")
+    Observable<TvShowsDetail> getTvShowById(@Path("tvId") String tvId, @Query("api_key") String apiKey);
 }

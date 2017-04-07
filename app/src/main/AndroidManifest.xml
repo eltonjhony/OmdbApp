@@ -23,7 +23,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".moviedetail.DetailsActivity"
+        <activity android:name=".details.DetailsActivity"
             android:parentActivityName=".main.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

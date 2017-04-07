@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.movies.android.omdbapp.R;
 import com.movies.android.omdbapp.browse.movies.MoviesFragment;
-import com.movies.android.omdbapp.browse.series.SeriesFragment;
+import com.movies.android.omdbapp.browse.tvshows.TvShowsFragment;
 
 /**
  * Created by eltonjhony on 4/4/17.
@@ -15,7 +15,7 @@ import com.movies.android.omdbapp.browse.series.SeriesFragment;
 public class MainPageAdapter extends FragmentPagerAdapter {
 
     private static final int MOVIES_INDEX = 0;
-    private static final int SERIES_INDEX = 1;
+    private static final int TV_SHOWS_INDEX = 1;
     private static final int TOTAL_PAGES = 2;
 
     private Context mContext;
@@ -30,8 +30,8 @@ public class MainPageAdapter extends FragmentPagerAdapter {
         switch (position) {
             case MOVIES_INDEX:
                 return MoviesFragment.newInstance();
-            case SERIES_INDEX:
-                return SeriesFragment.newInstance();
+            case TV_SHOWS_INDEX:
+                return TvShowsFragment.newInstance();
         }
         return null;
     }
@@ -46,8 +46,8 @@ public class MainPageAdapter extends FragmentPagerAdapter {
         switch (position) {
             case MOVIES_INDEX:
                 return mContext.getString(R.string.movies_label);
-            case SERIES_INDEX:
-                return mContext.getString(R.string.series_label);
+            case TV_SHOWS_INDEX:
+                return mContext.getString(R.string.tv_shows_label);
         }
         return super.getPageTitle(position);
     }

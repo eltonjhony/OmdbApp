@@ -1,8 +1,8 @@
-package com.movies.android.omdbapp.browse.movies;
+package com.movies.android.omdbapp.browse.tvshows;
 
 import com.android.annotations.NonNull;
-import com.movies.android.omdbapp.data.model.Movie;
-import com.movies.android.omdbapp.data.model.MovieDetail;
+import com.movies.android.omdbapp.data.model.TvShows;
+import com.movies.android.omdbapp.data.model.TvShowsDetail;
 
 import java.util.List;
 
@@ -10,14 +10,14 @@ import java.util.List;
  * Created by eltonjhony on 3/31/17.
  */
 
-public interface MoviesContract {
+public interface TvShowsContract {
 
     interface View {
         void setLoading(boolean isActive);
 
-        void showMovies(List<Movie> movies);
+        void displayTvShows(List<TvShows> tvShows);
 
-        void showMovieDetails(MovieDetail movieDetail);
+        void displayTvShowsDetails(TvShowsDetail tvShowsDetail);
 
         void showError(String message);
     }

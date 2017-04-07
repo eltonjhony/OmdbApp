@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.parceler.Parcel;
+
 import java.util.List;
 
 /**
@@ -12,88 +13,60 @@ import java.util.List;
 @Parcel
 public class ContentDetail {
 
-    @SerializedName("Title")
-    String title;
+    @SerializedName("id")
+    String id;
 
-    @SerializedName("Year")
-    String year;
+    @SerializedName("original_name")
+    String originalName;
 
-    @SerializedName("Rated")
-    String rated;
+    @SerializedName("genres")
+    List<Genres> genre;
 
-    @SerializedName("Released")
-    String released;
-
-    @SerializedName("Runtime")
-    String runtime;
-
-    @SerializedName("Genre")
-    String genre;
-
-    @SerializedName("Director")
-    String director;
-
-    @SerializedName("Awards")
-    String awards;
-
-    @SerializedName("Poster")
+    @SerializedName("poster_path")
     String poster;
 
-    @SerializedName("Language")
-    String language;
+    @SerializedName("popularity")
+    String popularity;
 
-    @SerializedName("Country")
-    String country;
+    @SerializedName("overview")
+    String overview;
 
-    @SerializedName("Ratings")
-    List<Rating> ratings;
+    @SerializedName("backdrop_path")
+    String backdropPath;
 
-    @SerializedName("imdbRating")
-    String imdbRating;
+    @SerializedName("homepage")
+    String homepage;
 
-    @SerializedName("Type")
-    String type;
+    @SerializedName("vote_average")
+    String voteAverage;
 
-    @SerializedName("Production")
-    String production;
-
-    @SerializedName("Website")
-    String website;
+    @SerializedName("vote_count")
+    String voteCount;
 
     public ContentDetail() {
     }
 
-    public ContentDetail(String title, String year, String rated, String released,
-                         String runtime, String genre, String director, String awards,
-                         String poster, String language, String country, List<Rating> ratings,
-                         String imdbRating, String type, String production, String website) {
-        this.title = title;
-        this.year = year;
-        this.rated = rated;
-        this.released = released;
-        this.runtime = runtime;
+    public ContentDetail(String id, String originalName, List<Genres> genre, String poster,
+                         String popularity, String overview, String backdropPath,
+                         String homepage, String voteAverage, String voteCount) {
+        this.id = id;
+        this.originalName = originalName;
         this.genre = genre;
-        this.director = director;
-        this.awards = awards;
         this.poster = poster;
-        this.language = language;
-        this.country = country;
-        this.ratings = ratings;
-        this.imdbRating = imdbRating;
-        this.type = type;
-        this.production = production;
-        this.website = website;
+        this.popularity = popularity;
+        this.overview = overview;
+        this.backdropPath = backdropPath;
+        this.homepage = homepage;
+        this.voteAverage = voteAverage;
+        this.voteCount = voteCount;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("title", title)
+                .append("originalName", originalName)
                 .append("genre", genre)
-                .append("director", director)
-                .append("language", language)
-                .append("country", country)
-                .append("runtime", runtime)
+                .append("poster", poster)
                 .toString();
     }
 }

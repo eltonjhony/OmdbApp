@@ -19,16 +19,16 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.movies.android.omdbapp.R;
-import com.movies.android.omdbapp.browse.adapters.MoviesAdapter;
-import com.movies.android.omdbapp.data.model.ContentDetail;
+import com.movies.android.omdbapp.browse.adapters.BrowseBaseAdapter;
 import com.movies.android.omdbapp.data.model.Movie;
+import com.movies.android.omdbapp.data.model.MovieDetail;
 import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.databinding.FragmentMoviesBinding;
 import com.movies.android.omdbapp.infraestructure.MyApplication;
 import com.movies.android.omdbapp.infraestructure.MyLog;
 import com.movies.android.omdbapp.infraestructure.preferences.SearcherPreferences;
 import com.movies.android.omdbapp.main.MainActivity;
-import com.movies.android.omdbapp.moviedetail.DetailsActivity;
+import com.movies.android.omdbapp.details.DetailsActivity;
 import com.movies.android.omdbapp.views.RecyclerViewWithEmptySupport;
 
 import org.parceler.Parcels;
@@ -45,7 +45,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     private FragmentMoviesBinding mBinding;
     private MoviesContract.Actions mActions;
-    private MoviesAdapter mAdapter;
+    private BrowseBaseAdapter mAdapter;
 
     @Inject
     API mApi;
@@ -137,7 +137,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     }
 
     @Override
-    public void showMovieDetails(ContentDetail detail) {
+    public void showMovieDetails(MovieDetail detail) {
         Intent intent = new Intent(getContext(), DetailsActivity.class);
         intent.putExtra(DetailsActivity.MOVIE_EXTRA, Parcels.wrap(detail));
         startActivity(intent);
@@ -150,14 +150,14 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     private void initialize() {
         mActions = new MoviesPresenter(mApi, this);
-        mAdapter = new MoviesAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
+        mAdapter = new BrowseBaseAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
     }
 
     private void setupAdapter() {
         RecyclerViewWithEmptySupport rv = mBinding.movieList;
         rv.setAdapter(mAdapter);
 
-        int numColumns = 3;
+        final int numColumns = 3;
 
         rv.setHasFixedSize(true);
         rv.setLayoutManager(new GridLayoutManager(getContext(), numColumns));
