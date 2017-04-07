@@ -6,8 +6,8 @@ import android.os.Bundle;
 import com.movies.android.omdbapp.R;
 import com.movies.android.omdbapp.data.model.MovieDetail;
 import com.movies.android.omdbapp.data.model.TvShowsDetail;
+import com.movies.android.omdbapp.infraestructure.MyApplication;
 import com.movies.android.omdbapp.infraestructure.MyLog;
-
 import org.parceler.Parcels;
 
 public class DetailsActivity extends AppCompatActivity {
@@ -19,6 +19,7 @@ public class DetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+        MyApplication.getServiceComponent().inject(this);
 
         MovieDetail movieDetail = Parcels.unwrap(getIntent().getParcelableExtra(MOVIE_EXTRA));
         TvShowsDetail tvShowsDetail = Parcels.unwrap(getIntent().getParcelableExtra(TV_SHOW_EXTRA));

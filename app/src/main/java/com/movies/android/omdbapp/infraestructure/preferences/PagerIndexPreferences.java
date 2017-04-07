@@ -5,9 +5,9 @@ import android.content.Context;
 /**
  * Created by eltonjhony on 4/7/17.
  */
-public class SearcherPreferences extends SimplePreferences {
+public class PagerIndexPreferences extends SimplePreferences {
 
-    public SearcherPreferences(Context context, String key) {
+    public PagerIndexPreferences(Context context, String key) {
         super(context, key);
     }
 }

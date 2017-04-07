@@ -26,6 +26,7 @@ import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.databinding.FragmentMoviesBinding;
 import com.movies.android.omdbapp.infraestructure.MyApplication;
 import com.movies.android.omdbapp.infraestructure.MyLog;
+import com.movies.android.omdbapp.infraestructure.preferences.PagerIndexPreferences;
 import com.movies.android.omdbapp.infraestructure.preferences.SearcherPreferences;
 import com.movies.android.omdbapp.main.MainActivity;
 import com.movies.android.omdbapp.details.DetailsActivity;
@@ -37,6 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import static com.movies.android.omdbapp.main.adapters.MainPageAdapter.MOVIES_INDEX;
+import static java.lang.String.valueOf;
 
 /**
  * Created by eltonjhony on 3/31/17.
@@ -52,6 +56,9 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Inject
     SearcherPreferences mSearcherPreferences;
+
+    @Inject
+    PagerIndexPreferences mPagerIndexPreferences;
 
     public MoviesFragment() {
     }
@@ -94,7 +101,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mSearcherPreferences.recordQuery(query);
+                mSearcherPreferences.saveAsync(query);
                 mActions.loadItems(query);
                 return true;
             }
@@ -138,6 +145,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Override
     public void showMovieDetails(MovieDetail detail) {
+        mPagerIndexPreferences.saveAsync(valueOf(MOVIES_INDEX));
         Intent intent = new Intent(getContext(), DetailsActivity.class);
         intent.putExtra(DetailsActivity.MOVIE_EXTRA, Parcels.wrap(detail));
         startActivity(intent);
@@ -169,6 +177,6 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
-        refreshLayout.setOnRefreshListener(() -> mActions.loadItems(mSearcherPreferences.getRecordedQuery()));
+        refreshLayout.setOnRefreshListener(() -> mActions.loadItems(mSearcherPreferences.get()));
     }
 }

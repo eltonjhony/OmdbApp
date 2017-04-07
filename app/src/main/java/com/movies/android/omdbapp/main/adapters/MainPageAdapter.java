@@ -14,8 +14,8 @@ import com.movies.android.omdbapp.browse.tvshows.TvShowsFragment;
  */
 public class MainPageAdapter extends FragmentPagerAdapter {
 
-    private static final int MOVIES_INDEX = 0;
-    private static final int TV_SHOWS_INDEX = 1;
+    public static final int MOVIES_INDEX = 0;
+    public static final int TV_SHOWS_INDEX = 1;
     private static final int TOTAL_PAGES = 2;
 
     private Context mContext;
@@ -51,4 +51,5 @@ public class MainPageAdapter extends FragmentPagerAdapter {
         }
         return super.getPageTitle(position);
     }
+
 }

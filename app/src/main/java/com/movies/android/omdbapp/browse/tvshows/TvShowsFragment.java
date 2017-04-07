@@ -26,6 +26,7 @@ import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.databinding.FragmentTvShowsBinding;
 import com.movies.android.omdbapp.infraestructure.MyApplication;
 import com.movies.android.omdbapp.infraestructure.MyLog;
+import com.movies.android.omdbapp.infraestructure.preferences.PagerIndexPreferences;
 import com.movies.android.omdbapp.infraestructure.preferences.SearcherPreferences;
 import com.movies.android.omdbapp.main.MainActivity;
 import com.movies.android.omdbapp.details.DetailsActivity;
@@ -37,6 +38,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+
+import static com.movies.android.omdbapp.main.adapters.MainPageAdapter.TV_SHOWS_INDEX;
+import static java.lang.String.valueOf;
 
 /**
  * Created by eltonjhony on 3/31/17.
@@ -52,6 +56,9 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
 
     @Inject
     SearcherPreferences mSearcherPreferences;
+
+    @Inject
+    PagerIndexPreferences mPagerIndexPreferences;
 
     public TvShowsFragment() {
     }
@@ -71,7 +78,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mActions.loadItems(mSearcherPreferences.getRecordedQuery());
+        mActions.loadItems(mSearcherPreferences.get());
     }
 
     @Nullable
@@ -94,7 +101,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mSearcherPreferences.recordQuery(query);
+                mSearcherPreferences.saveAsync(query);
                 mActions.loadItems(query);
                 return true;
             }
@@ -138,6 +145,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
 
     @Override
     public void displayTvShowsDetails(TvShowsDetail detail) {
+        mPagerIndexPreferences.saveAsync(valueOf(TV_SHOWS_INDEX));
         Intent intent = new Intent(getContext(), DetailsActivity.class);
         intent.putExtra(DetailsActivity.TV_SHOW_EXTRA, Parcels.wrap(detail));
         startActivity(intent);
@@ -170,7 +178,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         refreshLayout.setOnRefreshListener(() -> {
-            mActions.loadItems(mSearcherPreferences.getRecordedQuery());
+            mActions.loadItems(mSearcherPreferences.get());
         });
     }
 }
