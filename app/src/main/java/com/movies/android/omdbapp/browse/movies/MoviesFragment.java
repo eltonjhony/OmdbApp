@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import com.movies.android.omdbapp.R;
 import com.movies.android.omdbapp.browse.EndlessRecyclerViewScrollListener;
-import com.movies.android.omdbapp.browse.adapters.BrowseBaseAdapter;
+import com.movies.android.omdbapp.browse.adapters.MoviesRecyclerAdapter;
 import com.movies.android.omdbapp.data.model.Movie;
 import com.movies.android.omdbapp.data.model.MovieDetail;
 import com.movies.android.omdbapp.data.remote.API;
@@ -49,11 +49,9 @@ import static java.lang.String.valueOf;
  */
 public class MoviesFragment extends Fragment implements MoviesContract.View {
 
-    private static final int INITIAL_OFF_SET = 1;
-
     private FragmentMoviesBinding mBinding;
     private MoviesContract.Actions mActions;
-    private BrowseBaseAdapter mAdapter;
+    private MoviesRecyclerAdapter mAdapter;
 
     @Inject
     API mApi;
@@ -167,7 +165,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     private void initialize() {
         mActions = new MoviesPresenter(mApi, this);
-        mAdapter = new BrowseBaseAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
+        mAdapter = new MoviesRecyclerAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
     }
 
     private void setupAdapter() {

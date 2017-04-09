@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import com.movies.android.omdbapp.R;
 import com.movies.android.omdbapp.browse.EndlessRecyclerViewScrollListener;
-import com.movies.android.omdbapp.browse.adapters.BrowseBaseAdapter;
+import com.movies.android.omdbapp.browse.adapters.TvShowsRecyclerAdapter;
 import com.movies.android.omdbapp.data.model.TvShows;
 import com.movies.android.omdbapp.data.model.TvShowsDetail;
 import com.movies.android.omdbapp.data.remote.API;
@@ -49,11 +49,9 @@ import static java.lang.String.valueOf;
  */
 public class TvShowsFragment extends Fragment implements TvShowsContract.View {
 
-    private static final int INITIAL_OFF_SET = 1;
-
     private FragmentTvShowsBinding mBinding;
     private TvShowsContract.Actions mActions;
-    private BrowseBaseAdapter mAdapter;
+    private TvShowsRecyclerAdapter mAdapter;
 
     @Inject
     API mApi;
@@ -167,7 +165,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
 
     private void initialize() {
         mActions = new TvShowsPresenter(mApi, this);
-        mAdapter = new BrowseBaseAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
+        mAdapter = new TvShowsRecyclerAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
     }
 
     private void setupAdapter() {

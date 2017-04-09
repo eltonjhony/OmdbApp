@@ -46,9 +46,9 @@ public class MyLog {
         }
     }
 
-    public static void error(String tag, String message) {
+    public static void error(Object tag, String message) {
         if (BuildConfig.LOG_LEVEL >= LOG_LEVEL_ERROR && !TextUtils.isEmpty(message)) {
-            Log.e(tag, message);
+            Log.e(String.valueOf(tag), message);
         }
     }
 

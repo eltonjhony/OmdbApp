@@ -13,6 +13,9 @@ import java.util.List;
 public interface MoviesContract {
 
     interface View {
+
+        int INITIAL_OFF_SET = 1;
+
         void setLoading(boolean isActive);
 
         void showMovies(List<Movie> movies);

@@ -13,6 +13,9 @@ import java.util.List;
 public interface TvShowsContract {
 
     interface View {
+
+        int INITIAL_OFF_SET = 1;
+
         void setLoading(boolean isActive);
 
         void displayTvShows(List<TvShows> tvShows);

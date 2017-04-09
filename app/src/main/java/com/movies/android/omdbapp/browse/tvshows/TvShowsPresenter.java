@@ -7,7 +7,6 @@ import com.movies.android.omdbapp.data.model.TvShowsDetail;
 import com.movies.android.omdbapp.data.remote.ErrorHandler;
 import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.infraestructure.ApplicationConfiguration;
-import com.movies.android.omdbapp.infraestructure.MyLog;
 
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -42,7 +41,6 @@ public class TvShowsPresenter implements TvShowsContract.Actions {
                     @Override
                     public void onError(Throwable e) {
                         ErrorHandler.Error error = new ErrorHandler(e).extract();
-                        MyLog.error(error.code, error.message);
                         mView.setLoading(false);
                         mView.showError(error.message);
                     }
@@ -73,7 +71,6 @@ public class TvShowsPresenter implements TvShowsContract.Actions {
                     @Override
                     public void onError(Throwable e) {
                         ErrorHandler.Error error = new ErrorHandler(e).extract();
-                        MyLog.error(error.code, error.message);
                         mView.setLoading(false);
                         mView.showError(error.message);
                     }

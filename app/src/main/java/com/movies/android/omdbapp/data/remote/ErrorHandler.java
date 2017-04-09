@@ -1,8 +1,18 @@
 package com.movies.android.omdbapp.data.remote;
 
-import android.accounts.NetworkErrorException;
-
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.annotations.SerializedName;
 import com.movies.android.omdbapp.infraestructure.MyLog;
+
+import java.io.IOException;
+import java.io.Serializable;
+
+import okhttp3.ResponseBody;
+import retrofit2.adapter.rxjava.HttpException;
+
+import static com.movies.android.omdbapp.data.remote.ErrorHandler.Error.GENERIC_CODE;
+import static com.movies.android.omdbapp.data.remote.ErrorHandler.Error.GENERIC_MESSAGE;
 
 /**
  * Created by eltonjhony on 4/3/17.
@@ -16,25 +26,36 @@ public class ErrorHandler {
     }
 
     public Error extract() {
-        Throwable cause = t.getCause();
-        MyLog.error(ErrorHandler.class.getSimpleName(), cause.getMessage());
-        if (cause instanceof NetworkErrorException) {
-            return new Error(Error.NO_NETWORK_CODE, cause.getMessage());
+        MyLog.error(ErrorHandler.class.getSimpleName(), t.getMessage());
+        if (t instanceof HttpException) {
+            ResponseBody body = ((HttpException) t).response().errorBody();
+            try {
+                Gson gson = new Gson();
+                Error error = gson.fromJson(body.string(), Error.class);
+                MyLog.error(error.code, error.message);
+                return new Error(error.code, error.message);
+            } catch (IOException e) {
+                return new Error(GENERIC_CODE, GENERIC_MESSAGE);
+            }
         }
-        return new Error(Error.GENERIC_CODE, Error.GENERIC_MESSAGE);
+        return new Error(GENERIC_CODE, GENERIC_MESSAGE);
     }
 
-    public class Error {
+    public class Error implements Serializable {
 
         public static final String GENERIC_MESSAGE = "Something went wrong!";
+        public static final int GENERIC_CODE = 1;
 
-        public static final String NO_NETWORK_CODE = "74";
-        public static final String GENERIC_CODE = "45";
+        @SerializedName("status_code")
+        public int code;
 
-        public String code;
+        @SerializedName("status_message")
         public String message;
 
-        public Error(String code, String message) {
+        public Error() {
+        }
+
+        public Error(int code, String message) {
             this.code = code;
             this.message = message;
         }

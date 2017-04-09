@@ -1,5 +1,7 @@
 package com.movies.android.omdbapp.data.model;
 
+import android.text.TextUtils;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
@@ -31,6 +33,9 @@ public class Content implements Serializable {
     }
 
     public String getPosterUrl() {
+        if (TextUtils.isEmpty(this.posterUrl)) {
+            return null;
+        }
         StringBuilder builder = new StringBuilder(BASE_POSTER_URL);
         builder.append(IMG_SIZE_185).append("/").append(posterUrl);
         return builder.toString();

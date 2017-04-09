@@ -8,10 +8,13 @@ import java.util.List;
 /**
  * Created by eltonjhony on 3/31/17.
  */
-public class DataResultWrapper<T> {
+public class DataResultWrapper<T> extends ResponseWrapper {
 
     @SerializedName("page")
     private int page;
+
+    @SerializedName("success")
+    private boolean success;
 
     @SerializedName("results")
     private List<T> results;

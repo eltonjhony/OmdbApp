@@ -2,13 +2,15 @@ package com.movies.android.omdbapp.browse.adapters;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.Typeface;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 
 import com.movies.android.omdbapp.R;
-import com.movies.android.omdbapp.data.model.Content;
+import com.movies.android.omdbapp.data.model.TvShows;
 import com.movies.android.omdbapp.databinding.ContentItemBinding;
 import com.squareup.picasso.Picasso;
 
@@ -17,12 +19,12 @@ import java.util.List;
 /**
  * Created by eltonjhony on 3/31/17.
  */
-public class BrowseBaseAdapter extends RecyclerView.Adapter<BrowseBaseAdapter.ViewHolder> {
+public class TvShowsRecyclerAdapter extends RecyclerView.Adapter<TvShowsRecyclerAdapter.ViewHolder> {
 
-    private List<Content> mResults;
+    private List<TvShows> mResults;
     private OnContentItemClickListener mOnItemClickListener;
 
-    public BrowseBaseAdapter(List<? extends Content> results, OnContentItemClickListener listener) {
+    public TvShowsRecyclerAdapter(List<TvShows> results, OnContentItemClickListener listener) {
         setList(results);
         this.mOnItemClickListener = listener;
     }
@@ -38,9 +40,9 @@ public class BrowseBaseAdapter extends RecyclerView.Adapter<BrowseBaseAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Content content = mResults.get(position);
-        holder.update(content);
-        holder.setListeners(content);
+        TvShows tvShows = mResults.get(position);
+        holder.update(tvShows);
+        holder.setListeners(tvShows);
     }
 
     @Override
@@ -48,12 +50,12 @@ public class BrowseBaseAdapter extends RecyclerView.Adapter<BrowseBaseAdapter.Vi
         return mResults.size();
     }
 
-    public void replaceData(List<? extends Content> data) {
+    public void replaceData(List<TvShows> data) {
         setList(data);
         notifyDataSetChanged();
     }
 
-    public void appendData(List<? extends Content> data) {
+    public void appendData(List<TvShows> data) {
         if (data != null && !data.isEmpty()) {
             int currentSize = this.mResults.size();
             this.mResults.addAll(data);
@@ -61,13 +63,12 @@ public class BrowseBaseAdapter extends RecyclerView.Adapter<BrowseBaseAdapter.Vi
             notifyDataSetChanged();
         } else if (this.mResults == null) {
             replaceData(data);
-            return;
         }
 
     }
 
-    private void setList(List<? extends Content> contents) {
-        this.mResults = (List<Content>) contents;
+    private void setList(List<TvShows> tvShowses) {
+        this.mResults = tvShowses;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -79,18 +80,24 @@ public class BrowseBaseAdapter extends RecyclerView.Adapter<BrowseBaseAdapter.Vi
             this.mLayout = binding;
         }
 
-        private void update(Content content) {
-            Picasso.with(mLayout.movieThumbnail.getContext())
-                    .load(content.getPosterUrl())
+        private void update(TvShows tvShows) {
+            Picasso.with(mLayout.thumbnailView.getContext())
+                    .load(tvShows.getPosterUrl())
                     .fit().centerCrop()
                     .placeholder(R.drawable.ic_insert_photo_black_48px)
-                    .into(mLayout.movieThumbnail);
+                    .into(mLayout.thumbnailView);
+            if (TextUtils.isEmpty(tvShows.getPosterUrl())) {
+                mLayout.titleView.setTypeface(
+                        Typeface.createFromAsset(mLayout.titleView.getContext().getAssets(),
+                                "fonts/CaviarDreams.ttf"));
+                mLayout.titleView.setText(tvShows.getName());
+            }
         }
 
-        private void setListeners(final Content content) {
+        private void setListeners(final TvShows tvShows) {
             itemView.setOnClickListener(v -> {
                 v.startAnimation(AnimationUtils.loadAnimation(v.getContext(), R.anim.image_click));
-                mOnItemClickListener.onClicked(content.getId());
+                mOnItemClickListener.onClicked(tvShows.getId());
             });
         }
     }

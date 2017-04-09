@@ -9,7 +9,6 @@ import com.movies.android.omdbapp.data.remote.API;
 import com.movies.android.omdbapp.data.remote.ErrorHandler;
 import com.movies.android.omdbapp.data.model.DataResultWrapper;
 import com.movies.android.omdbapp.infraestructure.ApplicationConfiguration;
-import com.movies.android.omdbapp.infraestructure.MyLog;
 
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -33,7 +32,8 @@ public class MoviesPresenter implements MoviesContract.Actions {
     public void loadItems(String query, int offSet) {
         if (TextUtils.isEmpty(query)) {
             mView.setLoading(true);
-            mApi.fetchPopularMovies(ApplicationConfiguration.getApiKey(), offSet).subscribeOn(Schedulers.newThread())
+            mApi.fetchPopularMovies(ApplicationConfiguration.getApiKey(), offSet)
+                    .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<DataResultWrapper<Movie>>() {
                         @Override
@@ -43,7 +43,6 @@ public class MoviesPresenter implements MoviesContract.Actions {
                         @Override
                         public void onError(Throwable e) {
                             ErrorHandler.Error error = new ErrorHandler(e).extract();
-                            MyLog.error(error.code, error.message);
                             mView.setLoading(false);
                             mView.showError(error.message);
                         }
@@ -77,7 +76,6 @@ public class MoviesPresenter implements MoviesContract.Actions {
                     @Override
                     public void onError(Throwable e) {
                         ErrorHandler.Error error = new ErrorHandler(e).extract();
-                        MyLog.error(error.code, error.message);
                         mView.setLoading(false);
                         mView.showError(error.message);
                     }
@@ -107,7 +105,6 @@ public class MoviesPresenter implements MoviesContract.Actions {
                     @Override
                     public void onError(Throwable e) {
                         ErrorHandler.Error error = new ErrorHandler(e).extract();
-                        MyLog.error(error.code, error.message);
                         mView.setLoading(false);
                         mView.showError(error.message);
                     }
