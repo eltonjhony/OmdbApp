@@ -5,7 +5,7 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
     defaultConfig {
-        applicationId "com.movies.android.omdbapp"
+        applicationId "com.movies.android.aou"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
