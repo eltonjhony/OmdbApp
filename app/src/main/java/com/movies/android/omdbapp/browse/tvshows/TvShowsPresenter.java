@@ -28,10 +28,10 @@ public class TvShowsPresenter implements TvShowsContract.Actions {
     }
 
     @Override
-    public void loadItems(String query) {
+    public void loadItems(String query, int offSet) {
         final String searchText = query != null ? query : "Chicago"; //TODO To improve this!
         mView.setLoading(true);
-        mApi.searchTvShows(ApplicationConfiguration.getApiKey(), searchText)
+        mApi.searchTvShows(ApplicationConfiguration.getApiKey(), searchText, offSet)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<DataResultWrapper<TvShows>>() {
@@ -50,7 +50,11 @@ public class TvShowsPresenter implements TvShowsContract.Actions {
                     @Override
                     public void onNext(DataResultWrapper<TvShows> dataResultWrapper) {
                         mView.setLoading(false);
-                        mView.displayTvShows(dataResultWrapper.getData());
+                        if (dataResultWrapper.getPage() == 1) {
+                            mView.displayTvShows(dataResultWrapper.getData());
+                        } else {
+                            mView.displayMoreTvShows(dataResultWrapper.getData());
+                        }
                     }
                 });
     }

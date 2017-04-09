@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class BrowseBaseAdapter extends RecyclerView.Adapter<BrowseBaseAdapter.ViewHolder> {
 
-    private List<? extends Content> mResults;
+    private List<Content> mResults;
     private OnContentItemClickListener mOnItemClickListener;
 
     public BrowseBaseAdapter(List<? extends Content> results, OnContentItemClickListener listener) {
@@ -48,13 +48,26 @@ public class BrowseBaseAdapter extends RecyclerView.Adapter<BrowseBaseAdapter.Vi
         return mResults.size();
     }
 
-    public void replaceData(List<? extends Content> contents) {
-        setList(contents);
+    public void replaceData(List<? extends Content> data) {
+        setList(data);
         notifyDataSetChanged();
     }
 
+    public void appendData(List<? extends Content> data) {
+        if (data != null && !data.isEmpty()) {
+            int currentSize = this.mResults.size();
+            this.mResults.addAll(data);
+            notifyItemRangeInserted(currentSize, this.mResults.size() - 1);
+            notifyDataSetChanged();
+        } else if (this.mResults == null) {
+            replaceData(data);
+            return;
+        }
+
+    }
+
     private void setList(List<? extends Content> contents) {
-        this.mResults = contents;
+        this.mResults = (List<Content>) contents;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

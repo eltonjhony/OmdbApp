@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.movies.android.omdbapp.R;
+import com.movies.android.omdbapp.browse.EndlessRecyclerViewScrollListener;
 import com.movies.android.omdbapp.browse.adapters.BrowseBaseAdapter;
 import com.movies.android.omdbapp.data.model.Movie;
 import com.movies.android.omdbapp.data.model.MovieDetail;
@@ -46,6 +48,8 @@ import static java.lang.String.valueOf;
  * Created by eltonjhony on 3/31/17.
  */
 public class MoviesFragment extends Fragment implements MoviesContract.View {
+
+    private static final int INITIAL_OFF_SET = 1;
 
     private FragmentMoviesBinding mBinding;
     private MoviesContract.Actions mActions;
@@ -78,7 +82,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mActions.loadItems(null);
+        mActions.loadItems(null, INITIAL_OFF_SET);
     }
 
     @Nullable
@@ -102,7 +106,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mSearcherPreferences.saveAsync(query);
-                mActions.loadItems(query);
+                mActions.loadItems(query, INITIAL_OFF_SET);
                 return true;
             }
 
@@ -156,6 +160,11 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 
+    @Override
+    public void appendMoreMovies(List<Movie> data) {
+        mAdapter.appendData(data);
+    }
+
     private void initialize() {
         mActions = new MoviesPresenter(mApi, this);
         mAdapter = new BrowseBaseAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
@@ -168,7 +177,8 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         final int numColumns = 3;
 
         rv.setHasFixedSize(true);
-        rv.setLayoutManager(new GridLayoutManager(getContext(), numColumns));
+        GridLayoutManager layout = new GridLayoutManager(getContext(), numColumns);
+        rv.setLayoutManager(layout);
         rv.setEmptyView(mBinding.emptyLayout.getRoot());
 
         SwipeRefreshLayout refreshLayout = mBinding.refreshLayout;
@@ -177,6 +187,12 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
-        refreshLayout.setOnRefreshListener(() -> mActions.loadItems(mSearcherPreferences.get()));
+        refreshLayout.setOnRefreshListener(() -> mActions.loadItems(mSearcherPreferences.get(), INITIAL_OFF_SET));
+        rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {
+            @Override
+            public void onLoadMore(int page, int totalItemCount, RecyclerView recyclerView) {
+                mActions.loadItems(mSearcherPreferences.get(), page);
+            };
+        });
     }
 }

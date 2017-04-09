@@ -23,6 +23,10 @@ public class DataResultWrapper<T> {
         this.results = results;
     }
 
+    public int getPage() {
+        return page;
+    }
+
     public List<T> getData() {
         if (results == null) return new ArrayList<>();
         return results;

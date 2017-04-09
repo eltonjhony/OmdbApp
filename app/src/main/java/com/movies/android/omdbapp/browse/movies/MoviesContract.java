@@ -20,10 +20,12 @@ public interface MoviesContract {
         void showMovieDetails(MovieDetail movieDetail);
 
         void showError(String message);
+
+        void appendMoreMovies(List<Movie> data);
     }
 
     interface Actions {
-        void loadItems(String query);
+        void loadItems(String query, int offSet);
 
         void openDetails(@NonNull String id);
     }

@@ -2,6 +2,8 @@ package com.movies.android.omdbapp.data.remote;
 
 import android.accounts.NetworkErrorException;
 
+import com.movies.android.omdbapp.infraestructure.MyLog;
+
 /**
  * Created by eltonjhony on 4/3/17.
  */
@@ -15,6 +17,7 @@ public class ErrorHandler {
 
     public Error extract() {
         Throwable cause = t.getCause();
+        MyLog.error(ErrorHandler.class.getSimpleName(), cause.getMessage());
         if (cause instanceof NetworkErrorException) {
             return new Error(Error.NO_NETWORK_CODE, cause.getMessage());
         }

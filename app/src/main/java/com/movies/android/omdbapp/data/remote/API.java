@@ -18,13 +18,13 @@ import rx.Observable;
 public interface API {
 
     @GET("./movie/popular")
-    Observable<DataResultWrapper<Movie>> fetchPopularMovies(@Query("api_key") String apiKey);
+    Observable<DataResultWrapper<Movie>> fetchPopularMovies(@Query("api_key") String apiKey, @Query("page") int page);
 
     @GET("./search/movie")
-    Observable<DataResultWrapper<Movie>> searchMovies(@Query("api_key") String apiKey, @Query("query") String query);
+    Observable<DataResultWrapper<Movie>> searchMovies(@Query("api_key") String apiKey, @Query("query") String query, @Query("page") int page);
 
     @GET("./search/tv")
-    Observable<DataResultWrapper<TvShows>> searchTvShows(@Query("api_key") String apiKey, @Query("query") String query);
+    Observable<DataResultWrapper<TvShows>> searchTvShows(@Query("api_key") String apiKey, @Query("query") String query, @Query("page") int page);
 
     @GET("./movie/{movieId}")
     Observable<MovieDetail> getMovieById(@Path("movieId") String movieId, @Query("api_key") String apiKey);

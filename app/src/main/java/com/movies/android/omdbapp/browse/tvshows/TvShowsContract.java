@@ -20,10 +20,12 @@ public interface TvShowsContract {
         void displayTvShowsDetails(TvShowsDetail tvShowsDetail);
 
         void showError(String message);
+
+        void displayMoreTvShows(List<TvShows> data);
     }
 
     interface Actions {
-        void loadItems(String query);
+        void loadItems(String query, int offSet);
 
         void openDetails(@NonNull String id);
     }

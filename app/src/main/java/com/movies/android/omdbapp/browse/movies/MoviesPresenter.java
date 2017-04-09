@@ -30,10 +30,10 @@ public class MoviesPresenter implements MoviesContract.Actions {
     }
 
     @Override
-    public void loadItems(String query) {
+    public void loadItems(String query, int offSet) {
         if (TextUtils.isEmpty(query)) {
             mView.setLoading(true);
-            mApi.fetchPopularMovies(ApplicationConfiguration.getApiKey()).subscribeOn(Schedulers.newThread())
+            mApi.fetchPopularMovies(ApplicationConfiguration.getApiKey(), offSet).subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<DataResultWrapper<Movie>>() {
                         @Override
@@ -51,18 +51,22 @@ public class MoviesPresenter implements MoviesContract.Actions {
                         @Override
                         public void onNext(DataResultWrapper<Movie> dataResultWrapper) {
                             mView.setLoading(false);
-                            mView.showMovies(dataResultWrapper.getData());
+                            if (dataResultWrapper.getPage() == 1) {
+                                mView.showMovies(dataResultWrapper.getData());
+                            } else {
+                                mView.appendMoreMovies(dataResultWrapper.getData());
+                            }
                         }
                     });
 
         } else {
-            searchMovies(query);
+            searchMovies(query, offSet);
         }
     }
 
-    private void searchMovies(String query) {
+    private void searchMovies(String query, int offSet) {
         mView.setLoading(true);
-        mApi.searchMovies(ApplicationConfiguration.getApiKey(), query)
+        mApi.searchMovies(ApplicationConfiguration.getApiKey(), query, offSet)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<DataResultWrapper<Movie>>() {
@@ -81,7 +85,11 @@ public class MoviesPresenter implements MoviesContract.Actions {
                     @Override
                     public void onNext(DataResultWrapper<Movie> dataResultWrapper) {
                         mView.setLoading(false);
-                        mView.showMovies(dataResultWrapper.getData());
+                        if (dataResultWrapper.getPage() == 1) {
+                            mView.showMovies(dataResultWrapper.getData());
+                        } else {
+                            mView.appendMoreMovies(dataResultWrapper.getData());
+                        }
                     }
                 });
     }
