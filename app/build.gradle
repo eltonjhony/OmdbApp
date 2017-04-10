@@ -100,4 +100,5 @@ dependencies {
 
     androidTestCompile "com.android.support.test:runner:${runnerVersion}"
     androidTestCompile "com.android.support.test:rules:${rulesVersion}"
+    compile 'com.android.support.constraint:constraint-layout:+'
 }
