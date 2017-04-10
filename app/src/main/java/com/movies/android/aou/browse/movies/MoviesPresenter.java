@@ -5,11 +5,13 @@ import android.text.TextUtils;
 import com.android.annotations.NonNull;
 import com.movies.android.aou.data.model.Movie;
 import com.movies.android.aou.data.model.MovieDetail;
+import com.movies.android.aou.data.model.ContentSegmentEnum;
 import com.movies.android.aou.data.remote.API;
 import com.movies.android.aou.data.remote.ErrorHandler;
 import com.movies.android.aou.data.model.DataResultWrapper;
 import com.movies.android.aou.infraestructure.ApplicationConfiguration;
 
+import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -29,27 +31,25 @@ public class MoviesPresenter implements MoviesContract.Actions {
     }
 
     @Override
-    public void loadItems(String query, int offSet) {
+    public void loadItems(String query, ContentSegmentEnum contentSegmentEnum, int offSet) {
         if (TextUtils.isEmpty(query)) {
             mView.setLoading(true);
-            mApi.fetchPopularMovies(ApplicationConfiguration.getApiKey(), offSet)
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
+            Observable<DataResultWrapper<Movie>> observable = this.getMovieEndpointBySegment(contentSegmentEnum, offSet);
+            observable.subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<DataResultWrapper<Movie>>() {
                         @Override
                         public void onCompleted() {
+                            mView.setLoading(false);
                         }
 
                         @Override
                         public void onError(Throwable e) {
                             ErrorHandler.Error error = new ErrorHandler(e).extract();
-                            mView.setLoading(false);
                             mView.showError(error.message);
                         }
 
                         @Override
                         public void onNext(DataResultWrapper<Movie> dataResultWrapper) {
-                            mView.setLoading(false);
                             if (dataResultWrapper.getPage() == 1) {
                                 mView.showMovies(dataResultWrapper.getData());
                             } else {
@@ -59,8 +59,32 @@ public class MoviesPresenter implements MoviesContract.Actions {
                     });
 
         } else {
-            searchMovies(query, offSet);
+            this.searchMovies(query, offSet);
         }
+    }
+
+    @Override
+    public void openDetails(@NonNull String id) {
+        mView.setLoading(true);
+        mApi.getMovieById(id, ApplicationConfiguration.getApiKey()).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<MovieDetail>() {
+                    @Override
+                    public void onCompleted() {
+                        mView.setLoading(false);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ErrorHandler.Error error = new ErrorHandler(e).extract();
+                        mView.showError(error.message);
+                    }
+
+                    @Override
+                    public void onNext(MovieDetail movieDetail) {
+                        mView.showMovieDetails(movieDetail);
+                    }
+                });
     }
 
     private void searchMovies(String query, int offSet) {
@@ -92,28 +116,21 @@ public class MoviesPresenter implements MoviesContract.Actions {
                 });
     }
 
-    @Override
-    public void openDetails(@NonNull String id) {
-        mView.setLoading(true);
-        mApi.getMovieById(id, ApplicationConfiguration.getApiKey()).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<MovieDetail>() {
-                    @Override
-                    public void onCompleted() {
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        ErrorHandler.Error error = new ErrorHandler(e).extract();
-                        mView.setLoading(false);
-                        mView.showError(error.message);
-                    }
-
-                    @Override
-                    public void onNext(MovieDetail movieDetail) {
-                        mView.setLoading(false);
-                        mView.showMovieDetails(movieDetail);
-                    }
-                });
+    private Observable<DataResultWrapper<Movie>> getMovieEndpointBySegment(ContentSegmentEnum contentSegmentEnum, int offSet) {
+        Observable<DataResultWrapper<Movie>> observable;
+        switch (contentSegmentEnum) {
+            case POPULAR:
+                observable = mApi.fetchPopularMovies(ApplicationConfiguration.getApiKey(), offSet);
+                break;
+            case NOW_PLAYING:
+                observable = mApi.fetchNowPlayingMovies(ApplicationConfiguration.getApiKey(), offSet);
+                break;
+            case TOP_RATED:
+                observable = mApi.fetchTopRatedMovies(ApplicationConfiguration.getApiKey(), offSet);
+                break;
+            default:
+                throw new RuntimeException("Invalid option " + contentSegmentEnum);
+        }
+        return observable;
     }
 }

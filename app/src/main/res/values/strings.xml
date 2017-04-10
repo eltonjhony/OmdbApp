@@ -8,4 +8,8 @@
     <string name="search_hint">Find anything</string>
     <string name="data_not_found">Data not found</string>
     <string name="title_activity_splash">SplashActivity</string>
+    <string name="popular_label">popular</string>
+    <string name="now_playing_label">now playing</string>
+    <string name="top_rated_label">top rated</string>
+    <string name="on_the_air_label">on the air</string>
 </resources>

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -24,6 +25,7 @@ import com.movies.android.aou.browse.EndlessRecyclerViewScrollListener;
 import com.movies.android.aou.browse.adapters.MoviesRecyclerAdapter;
 import com.movies.android.aou.data.model.Movie;
 import com.movies.android.aou.data.model.MovieDetail;
+import com.movies.android.aou.data.model.ContentSegmentEnum;
 import com.movies.android.aou.data.remote.API;
 import com.movies.android.aou.databinding.FragmentMoviesBinding;
 import com.movies.android.aou.infraestructure.MyApplication;
@@ -41,6 +43,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import static com.movies.android.aou.data.model.ContentSegmentEnum.NOW_PLAYING;
+import static com.movies.android.aou.data.model.ContentSegmentEnum.POPULAR;
+import static com.movies.android.aou.data.model.ContentSegmentEnum.TOP_RATED;
 import static com.movies.android.aou.main.adapters.MainPageAdapter.MOVIES_INDEX;
 import static java.lang.String.valueOf;
 
@@ -50,6 +55,9 @@ import static java.lang.String.valueOf;
 public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     private FragmentMoviesBinding mBinding;
+
+    private BottomNavigationView mBottomNavigation;
+
     private MoviesContract.Actions mActions;
     private MoviesRecyclerAdapter mAdapter;
 
@@ -62,11 +70,14 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Inject
     PagerIndexPreferences mPagerIndexPreferences;
 
+    private ContentSegmentEnum selectedBottomNavigationItem = POPULAR;
+
     public MoviesFragment() {
     }
 
     public static MoviesFragment newInstance() {
-        return new MoviesFragment();
+        MoviesFragment fragment = new MoviesFragment();
+        return fragment;
     }
 
     @Override
@@ -80,7 +91,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mActions.loadItems(null, INITIAL_OFF_SET);
+        mActions.loadItems(null, selectedBottomNavigationItem, INITIAL_OFF_SET);
     }
 
     @Nullable
@@ -88,6 +99,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movies, container, false);
         setupAdapter();
+        setupBottomNavigation();
         return mBinding.getRoot();
     }
 
@@ -104,7 +116,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mSearcherPreferences.saveAsync(query);
-                mActions.loadItems(query, INITIAL_OFF_SET);
+                mActions.loadItems(query, selectedBottomNavigationItem, INITIAL_OFF_SET);
                 return true;
             }
 
@@ -185,12 +197,36 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
-        refreshLayout.setOnRefreshListener(() -> mActions.loadItems(mSearcherPreferences.get(), INITIAL_OFF_SET));
+        refreshLayout.setOnRefreshListener(() -> mActions.loadItems(mSearcherPreferences.get(),
+                selectedBottomNavigationItem, INITIAL_OFF_SET));
         rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {
             @Override
             public void onLoadMore(int page, int totalItemCount, RecyclerView recyclerView) {
-                mActions.loadItems(mSearcherPreferences.get(), page);
+                mActions.loadItems(mSearcherPreferences.get(), selectedBottomNavigationItem, page);
             };
+        });
+    }
+
+    private void setupBottomNavigation() {
+        mBottomNavigation = mBinding.moviesBottomNavigation;
+        mBottomNavigation.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.action_popular:
+                    MoviesFragment.this.selectedBottomNavigationItem = POPULAR;
+                    mActions.loadItems(null, POPULAR, INITIAL_OFF_SET);
+                    break;
+
+                case R.id.action_now_playing:
+                    MoviesFragment.this.selectedBottomNavigationItem = NOW_PLAYING;
+                    mActions.loadItems(null, NOW_PLAYING, INITIAL_OFF_SET);
+                    break;
+
+                case R.id.action_top_rated:
+                    MoviesFragment.this.selectedBottomNavigationItem = TOP_RATED;
+                    mActions.loadItems(null, TOP_RATED, INITIAL_OFF_SET);
+                    break;
+            }
+            return true;
         });
     }
 }

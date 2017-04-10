@@ -1,6 +1,7 @@
 package com.movies.android.aou.browse.tvshows;
 
 import com.android.annotations.NonNull;
+import com.movies.android.aou.data.model.ContentSegmentEnum;
 import com.movies.android.aou.data.model.TvShows;
 import com.movies.android.aou.data.model.TvShowsDetail;
 
@@ -28,7 +29,7 @@ public interface TvShowsContract {
     }
 
     interface Actions {
-        void loadItems(String query, int offSet);
+        void loadItems(String query, ContentSegmentEnum contentSegmentEnum, int offSet);
 
         void openDetails(@NonNull String id);
     }

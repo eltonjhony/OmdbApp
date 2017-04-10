@@ -3,6 +3,7 @@ package com.movies.android.aou.browse.movies;
 import com.android.annotations.NonNull;
 import com.movies.android.aou.data.model.Movie;
 import com.movies.android.aou.data.model.MovieDetail;
+import com.movies.android.aou.data.model.ContentSegmentEnum;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public interface MoviesContract {
     }
 
     interface Actions {
-        void loadItems(String query, int offSet);
+        void loadItems(String query, ContentSegmentEnum contentSegmentEnum, int offSet);
 
         void openDetails(@NonNull String id);
     }

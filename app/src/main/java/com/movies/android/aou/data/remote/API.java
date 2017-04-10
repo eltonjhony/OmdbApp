@@ -20,11 +20,26 @@ public interface API {
     @GET("./movie/popular")
     Observable<DataResultWrapper<Movie>> fetchPopularMovies(@Query("api_key") String apiKey, @Query("page") int page);
 
+    @GET("./movie/top_rated")
+    Observable<DataResultWrapper<Movie>> fetchTopRatedMovies(@Query("api_key") String apiKey, @Query("page") int page);
+
+    @GET("./movie/now_playing")
+    Observable<DataResultWrapper<Movie>> fetchNowPlayingMovies(@Query("api_key") String apiKey, @Query("page") int page);
+
     @GET("./search/movie")
     Observable<DataResultWrapper<Movie>> searchMovies(@Query("api_key") String apiKey, @Query("query") String query, @Query("page") int page);
 
     @GET("./search/tv")
     Observable<DataResultWrapper<TvShows>> searchTvShows(@Query("api_key") String apiKey, @Query("query") String query, @Query("page") int page);
+
+    @GET("./tv/popular")
+    Observable<DataResultWrapper<TvShows>> fetchPopularTvShows(@Query("api_key") String apiKey, @Query("page") int page);
+
+    @GET("./tv/on_the_air")
+    Observable<DataResultWrapper<TvShows>> fetchOnTheAirTvShows(@Query("api_key") String apiKey, @Query("page") int page);
+
+    @GET("./tv/top_rated")
+    Observable<DataResultWrapper<TvShows>> fetchTopRatedTvShows(@Query("api_key") String apiKey, @Query("page") int page);
 
     @GET("./movie/{movieId}")
     Observable<MovieDetail> getMovieById(@Path("movieId") String movieId, @Query("api_key") String apiKey);

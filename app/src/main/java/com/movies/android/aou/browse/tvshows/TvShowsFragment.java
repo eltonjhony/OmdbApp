@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.movies.android.aou.R;
 import com.movies.android.aou.browse.EndlessRecyclerViewScrollListener;
 import com.movies.android.aou.browse.adapters.TvShowsRecyclerAdapter;
+import com.movies.android.aou.data.model.ContentSegmentEnum;
 import com.movies.android.aou.data.model.TvShows;
 import com.movies.android.aou.data.model.TvShowsDetail;
 import com.movies.android.aou.data.remote.API;
@@ -41,6 +43,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import static com.movies.android.aou.data.model.ContentSegmentEnum.ON_THE_AIR;
+import static com.movies.android.aou.data.model.ContentSegmentEnum.POPULAR;
+import static com.movies.android.aou.data.model.ContentSegmentEnum.TOP_RATED;
 import static com.movies.android.aou.main.adapters.MainPageAdapter.TV_SHOWS_INDEX;
 import static java.lang.String.valueOf;
 
@@ -50,6 +55,9 @@ import static java.lang.String.valueOf;
 public class TvShowsFragment extends Fragment implements TvShowsContract.View {
 
     private FragmentTvShowsBinding mBinding;
+
+    private BottomNavigationView mBottomNavigationMenu;
+
     private TvShowsContract.Actions mActions;
     private TvShowsRecyclerAdapter mAdapter;
 
@@ -61,6 +69,8 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
 
     @Inject
     PagerIndexPreferences mPagerIndexPreferences;
+
+    private ContentSegmentEnum selectedBottomNavigationItem = POPULAR;
 
     public TvShowsFragment() {
     }
@@ -80,7 +90,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mActions.loadItems(mSearcherPreferences.get(), INITIAL_OFF_SET);
+        mActions.loadItems(mSearcherPreferences.get(), selectedBottomNavigationItem, INITIAL_OFF_SET);
     }
 
     @Nullable
@@ -88,6 +98,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_tv_shows, container, false);
         setupAdapter();
+        setupBottomNavigation();
         return mBinding.getRoot();
     }
 
@@ -104,7 +115,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 mSearcherPreferences.saveAsync(query);
-                mActions.loadItems(query, INITIAL_OFF_SET);
+                mActions.loadItems(query, selectedBottomNavigationItem, INITIAL_OFF_SET);
                 return true;
             }
 
@@ -186,13 +197,36 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         refreshLayout.setOnRefreshListener(() -> {
-            mActions.loadItems(mSearcherPreferences.get(), INITIAL_OFF_SET);
+            mActions.loadItems(mSearcherPreferences.get(), selectedBottomNavigationItem, INITIAL_OFF_SET);
         });
         rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {
             @Override
             public void onLoadMore(int page, int totalItemCount, RecyclerView recyclerView) {
-                mActions.loadItems(mSearcherPreferences.get(), page);
+                mActions.loadItems(mSearcherPreferences.get(), selectedBottomNavigationItem, page);
             }
+        });
+    }
+
+    private void setupBottomNavigation() {
+        mBottomNavigationMenu = mBinding.tvShowsBottomNavigation;
+        mBottomNavigationMenu.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.action_popular:
+                    TvShowsFragment.this.selectedBottomNavigationItem = POPULAR;
+                    mActions.loadItems(null, POPULAR, INITIAL_OFF_SET);
+                    break;
+
+                case R.id.action_on_the_air:
+                    TvShowsFragment.this.selectedBottomNavigationItem = ON_THE_AIR;
+                    mActions.loadItems(null, ON_THE_AIR, INITIAL_OFF_SET);
+                    break;
+
+                case R.id.action_top_rated:
+                    TvShowsFragment.this.selectedBottomNavigationItem = TOP_RATED;
+                    mActions.loadItems(null, TOP_RATED, INITIAL_OFF_SET);
+                    break;
+            }
+            return true;
         });
     }
 }

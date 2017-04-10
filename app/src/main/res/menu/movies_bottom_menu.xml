@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_popular"
+        android:icon="@drawable/ic_star_border_black_24dp"
+        android:title="@string/popular_label"/>
+    <item
+        android:id="@+id/action_now_playing"
+        android:icon="@drawable/ic_voice_chat_black_24dp"
+        android:title="@string/now_playing_label"/>
+    <item
+        android:id="@+id/action_top_rated"
+        android:icon="@drawable/ic_vertical_align_top_black_24dp"
+        android:title="@string/top_rated_label"/>
+</menu>

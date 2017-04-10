@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -87,7 +86,7 @@ public class MoviesPresenterTest {
         PowerMockito.when(TextUtils.isEmpty(anyString())).thenReturn(true);
 
         // When the presenter is called to load movies.
-        mPresenter.loadItems("test", anyInt());
+        mPresenter.loadItems("test", , anyInt());
 
         // Then, the loading should be called with true argument
         verify(mView, times(1)).setLoading(true);
@@ -110,7 +109,7 @@ public class MoviesPresenterTest {
         PowerMockito.when(TextUtils.isEmpty(anyString())).thenReturn(true);
 
         // When the presenter is called to load movies.
-        mPresenter.loadItems("test", anyInt());
+        mPresenter.loadItems("test", , anyInt());
 
         // Then, the loading should be called with true argument
         verify(mView, times(1)).setLoading(true);
