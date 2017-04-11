@@ -5,6 +5,7 @@ import com.movies.android.aou.data.model.Movie;
 import com.movies.android.aou.data.model.MovieDetail;
 import com.movies.android.aou.data.model.TvShows;
 import com.movies.android.aou.data.model.TvShowsDetail;
+import com.movies.android.aou.data.model.VideoWrapper;
 
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -28,6 +29,9 @@ public interface API {
 
     @GET("./search/movie")
     Observable<DataResultWrapper<Movie>> searchMovies(@Query("api_key") String apiKey, @Query("query") String query, @Query("page") int page);
+
+    @GET("./movie/{movieId}/videos")
+    Observable<VideoWrapper> getVideosById(@Path("movieId") String movieId, @Query("api_key") String apiKey);
 
     @GET("./search/tv")
     Observable<DataResultWrapper<TvShows>> searchTvShows(@Query("api_key") String apiKey, @Query("query") String query, @Query("page") int page);

@@ -2,10 +2,12 @@ package com.movies.android.aou.browse.movies;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -98,6 +100,8 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_movies, container, false);
+        mBinding.movieDescText.setTypeface(Typeface.createFromAsset(getContext().getAssets(), "fonts/BebasNeue.otf"));
+
         setupAdapter();
         setupBottomNavigation();
         return mBinding.getRoot();
@@ -154,6 +158,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Override
     public void showMovies(List<Movie> movies) {
+        mActions.retrieveFeaturedVideo(movies);
         mAdapter.replaceData(movies);
     }
 
@@ -173,6 +178,12 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public void appendMoreMovies(List<Movie> data) {
         mAdapter.appendData(data);
+    }
+
+    @Override
+    public void setupFeaturedVideo(String videoUrl) {
+        FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+        transaction.replace(R.id.youtubeplayerfragment, FeaturedVideoFragment.newInstance(videoUrl)).commit();
     }
 
     private void initialize() {
@@ -213,20 +224,24 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
             switch (item.getItemId()) {
                 case R.id.action_popular:
                     MoviesFragment.this.selectedBottomNavigationItem = POPULAR;
+                    mBinding.movieDescText.setText(R.string.most_popular_label);
                     mActions.loadItems(null, POPULAR, INITIAL_OFF_SET);
                     break;
 
                 case R.id.action_now_playing:
-                    MoviesFragment.this.selectedBottomNavigationItem = NOW_PLAYING;
+                    selectedBottomNavigationItem = NOW_PLAYING;
+                    mBinding.movieDescText.setText(R.string.now_playing_label);
                     mActions.loadItems(null, NOW_PLAYING, INITIAL_OFF_SET);
                     break;
 
                 case R.id.action_top_rated:
-                    MoviesFragment.this.selectedBottomNavigationItem = TOP_RATED;
+                    selectedBottomNavigationItem = TOP_RATED;
+                    mBinding.movieDescText.setText(R.string.top_rated_label);
                     mActions.loadItems(null, TOP_RATED, INITIAL_OFF_SET);
                     break;
             }
             return true;
         });
     }
+
 }

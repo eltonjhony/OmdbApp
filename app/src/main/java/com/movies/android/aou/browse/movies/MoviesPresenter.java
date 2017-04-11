@@ -6,10 +6,14 @@ import com.android.annotations.NonNull;
 import com.movies.android.aou.data.model.Movie;
 import com.movies.android.aou.data.model.MovieDetail;
 import com.movies.android.aou.data.model.ContentSegmentEnum;
+import com.movies.android.aou.data.model.Video;
+import com.movies.android.aou.data.model.VideoWrapper;
 import com.movies.android.aou.data.remote.API;
 import com.movies.android.aou.data.remote.ErrorHandler;
 import com.movies.android.aou.data.model.DataResultWrapper;
 import com.movies.android.aou.infraestructure.ApplicationConfiguration;
+
+import java.util.List;
 
 import rx.Observable;
 import rx.Observer;
@@ -21,6 +25,8 @@ import rx.schedulers.Schedulers;
  */
 
 public class MoviesPresenter implements MoviesContract.Actions {
+
+    private static final int FIRST_ITEM = 0;
 
     private API mApi;
     private MoviesContract.View mView;
@@ -61,6 +67,37 @@ public class MoviesPresenter implements MoviesContract.Actions {
         } else {
             this.searchMovies(query, offSet);
         }
+    }
+
+    @Override
+    public void retrieveFeaturedVideo(List<Movie> movies) {
+        Movie movie = movies.get(FIRST_ITEM);
+        mView.setLoading(true);
+        mApi.getVideosById(movie.getId(), ApplicationConfiguration.getApiKey())
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<VideoWrapper>() {
+                    @Override
+                    public void onCompleted() {
+                        mView.setLoading(false);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        ErrorHandler.Error error = new ErrorHandler(e).extract();
+                        mView.showError(error.message);
+                    }
+
+                    @Override
+                    public void onNext(VideoWrapper videoWrapper) {
+                        List<Video> results = videoWrapper.getResults();
+                        if (results != null && !results.isEmpty()) {
+                            Video video = results.get(FIRST_ITEM);
+                            mView.setupFeaturedVideo(video.getKey());
+                        }
+                    }
+                });
+
     }
 
     @Override

@@ -19,6 +19,7 @@ public class ApplicationConfiguration {
     static {
         applicationParameterCacheMap.put(Constants.ApplicationConfigurationParameter.DEFAULT_HOST, BuildConfig.DEFAULT_HOST);
         applicationParameterCacheMap.put(Constants.ApplicationConfigurationParameter.API_KEY, BuildConfig.API_KEY);
+        applicationParameterCacheMap.put(Constants.ApplicationConfigurationParameter.YOUTUBE_KEY, BuildConfig.YOUTUBE_KEY);
     }
 
     public static String getDefaultHost() {
@@ -27,6 +28,10 @@ public class ApplicationConfiguration {
 
     public static String getApiKey() {
         return applicationParameterCacheMap.get(Constants.ApplicationConfigurationParameter.API_KEY);
+    }
+
+    public static String getYoutubeKey() {
+        return applicationParameterCacheMap.get(Constants.ApplicationConfigurationParameter.YOUTUBE_KEY);
     }
 
 

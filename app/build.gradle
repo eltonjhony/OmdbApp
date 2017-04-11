@@ -26,6 +26,7 @@ android {
             buildConfigField("int", "LOG_LEVEL", "0")
             buildConfigField("String", "DEFAULT_HOST", "\"http://api.themoviedb.org/3/\"")
             buildConfigField("String", "API_KEY", "\"1de4f2865be37bb3dc6c0fc2fc9e6b13\"")
+            buildConfigField("String", "YOUTUBE_KEY", "\"86722914125-dibsgd6pkal1cfsaj42fiimjggra3o55.apps.googleusercontent.com\t\"")
         }
         debug {
             minifyEnabled false
@@ -33,6 +34,7 @@ android {
             buildConfigField("int", "LOG_LEVEL", "4")
             buildConfigField("String", "DEFAULT_HOST", "\"http://api.themoviedb.org/3/\"")
             buildConfigField("String", "API_KEY", "\"1de4f2865be37bb3dc6c0fc2fc9e6b13\"")
+            buildConfigField("String", "YOUTUBE_KEY", "\"86722914125-dibsgd6pkal1cfsaj42fiimjggra3o55.apps.googleusercontent.com\t\"")
         }
     }
     compileOptions {

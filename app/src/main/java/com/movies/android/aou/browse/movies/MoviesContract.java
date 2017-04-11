@@ -26,10 +26,14 @@ public interface MoviesContract {
         void showError(String message);
 
         void appendMoreMovies(List<Movie> data);
+
+        void setupFeaturedVideo(String videoUrl);
     }
 
     interface Actions {
         void loadItems(String query, ContentSegmentEnum contentSegmentEnum, int offSet);
+
+        void retrieveFeaturedVideo(List<Movie> movies);
 
         void openDetails(@NonNull String id);
     }

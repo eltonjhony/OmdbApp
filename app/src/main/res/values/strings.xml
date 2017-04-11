@@ -12,4 +12,5 @@
     <string name="now_playing_label">now playing</string>
     <string name="top_rated_label">top rated</string>
     <string name="on_the_air_label">on the air</string>
+    <string name="most_popular_label">Most Popular</string>
 </resources>
