@@ -9,11 +9,17 @@ public class Constants {
     }
 
     public interface PreferenceKeys {
-        String SEARCHER = new String(new char[]{'a', 's', 'd', 'f', 'c', 'a', 'f', 'd', 'g',
+        String SIMPLE_PREF_KEY = new String(new char[]{'a', 's', 'd', 'f', 'c', 'a', 'f', 'd', 'g',
                 's', 'f', 'v', 'c', 'x', 'e', 'r', 'd', 't', 'y', 'j', 'h', 'g', 'f', 'd', 's', 'e' });
 
-        String PAGER_INDEX = new String(new char[]{'p', 'u', 'e', 'r', 'c', 'o', 'r', 'w', 'e',
-                'f', 'f', 'l', 'd', 'v', 'l', 'p', 'o', 'q', 'r', 'f', 'h', 'p', 'u', 'i', 'e', 'm' });
+        String SEARCHER_KEY = new String(new char[]{'a', 's', 'd', 'e', 'c', 'a', 'f', 'd', 'g',
+                'h', 'u', 'i', 'r', 'x', 'e', 'r', 'd', 't', 'y', 't', 'q', 's', 't', 'd', 's', 'e' });
+
+        String PAGER_KEY = new String(new char[]{'s', 'r', 'd', 'f', 'c', 'a', 'f', 'q', 'l',
+                's', 'f', 'o', 'c', 'r', 'r', 'r', 'd', 't', 'y', 'q', 'h', 'g', 'f', 'd', 'r', 'w' });
+
+        String SHOW_HIDE_KEY = new String(new char[]{'e', 'y', 'b', 'f', 'e', 'a', 'x', 'd', 'x',
+                'q', 'e', 'r', 'c', 'r', 'r', 'j', 'g', 'r', 'e', 'i', 'u', 'y', 'f', 'r', 't', 'w' });;
     }
 
     public interface ApplicationConfigurationParameter {

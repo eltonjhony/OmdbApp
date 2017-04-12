@@ -32,5 +32,7 @@ public interface TvShowsContract {
         void loadItems(String query, ContentSegmentEnum contentSegmentEnum, int offSet);
 
         void openDetails(@NonNull String id);
+
+        void onDestroy();
     }
 }

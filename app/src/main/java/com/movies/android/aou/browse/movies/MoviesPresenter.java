@@ -15,6 +15,8 @@ import com.movies.android.aou.infraestructure.ApplicationConfiguration;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -23,7 +25,6 @@ import rx.schedulers.Schedulers;
 /**
  * Created by eltonjhony on 3/31/17.
  */
-
 public class MoviesPresenter implements MoviesContract.Actions {
 
     private static final int FIRST_ITEM = 0;
@@ -31,9 +32,13 @@ public class MoviesPresenter implements MoviesContract.Actions {
     private API mApi;
     private MoviesContract.View mView;
 
-    public MoviesPresenter(API api, MoviesContract.View view) {
-        this.mView = view;
+    @Inject
+    public MoviesPresenter(API api) {
         this.mApi = api;
+    }
+
+    public void setView(@NonNull MoviesFragment view) {
+        this.mView = view;
     }
 
     @Override
@@ -122,6 +127,11 @@ public class MoviesPresenter implements MoviesContract.Actions {
                         mView.showMovieDetails(movieDetail);
                     }
                 });
+    }
+
+    @Override
+    public void onDestroy() {
+        this.mView = null;
     }
 
     private void searchMovies(String query, int offSet) {

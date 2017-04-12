@@ -14,6 +14,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,14 +29,13 @@ import com.movies.android.aou.browse.adapters.MoviesRecyclerAdapter;
 import com.movies.android.aou.data.model.Movie;
 import com.movies.android.aou.data.model.MovieDetail;
 import com.movies.android.aou.data.model.ContentSegmentEnum;
-import com.movies.android.aou.data.remote.API;
 import com.movies.android.aou.databinding.FragmentMoviesBinding;
 import com.movies.android.aou.infraestructure.MyApplication;
 import com.movies.android.aou.infraestructure.MyLog;
-import com.movies.android.aou.infraestructure.preferences.PagerIndexPreferences;
-import com.movies.android.aou.infraestructure.preferences.SearcherPreferences;
+import com.movies.android.aou.infraestructure.preferences.SimplePreferences;
 import com.movies.android.aou.main.MainActivity;
 import com.movies.android.aou.details.DetailsActivity;
+import com.movies.android.aou.views.AnimatingFrameLayout;
 import com.movies.android.aou.views.RecyclerViewWithEmptySupport;
 
 import org.parceler.Parcels;
@@ -48,6 +48,9 @@ import javax.inject.Inject;
 import static com.movies.android.aou.data.model.ContentSegmentEnum.NOW_PLAYING;
 import static com.movies.android.aou.data.model.ContentSegmentEnum.POPULAR;
 import static com.movies.android.aou.data.model.ContentSegmentEnum.TOP_RATED;
+import static com.movies.android.aou.infraestructure.Constants.PreferenceKeys.PAGER_KEY;
+import static com.movies.android.aou.infraestructure.Constants.PreferenceKeys.SEARCHER_KEY;
+import static com.movies.android.aou.infraestructure.Constants.PreferenceKeys.SHOW_HIDE_KEY;
 import static com.movies.android.aou.main.adapters.MainPageAdapter.MOVIES_INDEX;
 import static java.lang.String.valueOf;
 
@@ -56,21 +59,18 @@ import static java.lang.String.valueOf;
  */
 public class MoviesFragment extends Fragment implements MoviesContract.View {
 
+    public static final String HIDE_FEATURED_VIDEO = "HIDE";
+
     private FragmentMoviesBinding mBinding;
 
     private BottomNavigationView mBottomNavigation;
-
-    private MoviesContract.Actions mActions;
     private MoviesRecyclerAdapter mAdapter;
 
     @Inject
-    API mApi;
+    MoviesPresenter mPresenter;
 
     @Inject
-    SearcherPreferences mSearcherPreferences;
-
-    @Inject
-    PagerIndexPreferences mPagerIndexPreferences;
+    SimplePreferences mSimplePreferences;
 
     private ContentSegmentEnum selectedBottomNavigationItem = POPULAR;
 
@@ -93,7 +93,12 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mActions.loadItems(null, selectedBottomNavigationItem, INITIAL_OFF_SET);
+        if (TextUtils.isEmpty(this.mSimplePreferences.get(SHOW_HIDE_KEY))) {
+            mBinding.youtubeplayerfragment.show();
+        } else {
+            mBinding.youtubeplayerfragment.hide();
+        }
+        mPresenter.loadItems(null, selectedBottomNavigationItem, INITIAL_OFF_SET);
     }
 
     @Nullable
@@ -104,7 +109,15 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
         setupAdapter();
         setupBottomNavigation();
+        setListeners();
+
         return mBinding.getRoot();
+    }
+
+    @Override
+    public void onDestroy() {
+        this.mPresenter.onDestroy();
+        super.onDestroy();
     }
 
     @Override
@@ -119,8 +132,8 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mSearcherPreferences.saveAsync(query);
-                mActions.loadItems(query, selectedBottomNavigationItem, INITIAL_OFF_SET);
+                mSimplePreferences.saveAsync(SEARCHER_KEY, query);
+                mPresenter.loadItems(query, selectedBottomNavigationItem, INITIAL_OFF_SET);
                 return true;
             }
 
@@ -140,7 +153,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.search:
-                        mSearcherPreferences.clear();
+                        mSimplePreferences.clear();
                 }
                 return true;
             }
@@ -158,13 +171,13 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Override
     public void showMovies(List<Movie> movies) {
-        mActions.retrieveFeaturedVideo(movies);
+        mPresenter.retrieveFeaturedVideo(movies);
         mAdapter.replaceData(movies);
     }
 
     @Override
     public void showMovieDetails(MovieDetail detail) {
-        mPagerIndexPreferences.saveAsync(valueOf(MOVIES_INDEX));
+        mSimplePreferences.saveAsync(PAGER_KEY, valueOf(MOVIES_INDEX));
         Intent intent = new Intent(getContext(), DetailsActivity.class);
         intent.putExtra(DetailsActivity.MOVIE_EXTRA, Parcels.wrap(detail));
         startActivity(intent);
@@ -187,8 +200,21 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     }
 
     private void initialize() {
-        mActions = new MoviesPresenter(mApi, this);
-        mAdapter = new MoviesRecyclerAdapter(new ArrayList<>(0), id -> mActions.openDetails(id));
+        mPresenter.setView(this);
+        mAdapter = new MoviesRecyclerAdapter(new ArrayList<>(0), id -> mPresenter.openDetails(id));
+    }
+
+    private void setListeners() {
+        mBinding.hideShowBtn.setOnClickListener(v -> {
+            AnimatingFrameLayout youtubeFrameLayout = mBinding.youtubeplayerfragment;
+            if (youtubeFrameLayout.isVisible()) {
+                youtubeFrameLayout.hide();
+                this.mSimplePreferences.saveAsync(SHOW_HIDE_KEY, HIDE_FEATURED_VIDEO);
+            } else {
+                youtubeFrameLayout.show();
+                this.mSimplePreferences.saveAsync(SHOW_HIDE_KEY, "");
+            }
+        });
     }
 
     private void setupAdapter() {
@@ -208,12 +234,12 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
-        refreshLayout.setOnRefreshListener(() -> mActions.loadItems(mSearcherPreferences.get(),
+        refreshLayout.setOnRefreshListener(() -> mPresenter.loadItems(mSimplePreferences.get(SEARCHER_KEY),
                 selectedBottomNavigationItem, INITIAL_OFF_SET));
         rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {
             @Override
             public void onLoadMore(int page, int totalItemCount, RecyclerView recyclerView) {
-                mActions.loadItems(mSearcherPreferences.get(), selectedBottomNavigationItem, page);
+                mPresenter.loadItems(mSimplePreferences.get(SEARCHER_KEY), selectedBottomNavigationItem, page);
             };
         });
     }
@@ -225,19 +251,19 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                 case R.id.action_popular:
                     MoviesFragment.this.selectedBottomNavigationItem = POPULAR;
                     mBinding.movieDescText.setText(R.string.most_popular_label);
-                    mActions.loadItems(null, POPULAR, INITIAL_OFF_SET);
+                    mPresenter.loadItems(null, POPULAR, INITIAL_OFF_SET);
                     break;
 
                 case R.id.action_now_playing:
                     selectedBottomNavigationItem = NOW_PLAYING;
                     mBinding.movieDescText.setText(R.string.now_playing_label);
-                    mActions.loadItems(null, NOW_PLAYING, INITIAL_OFF_SET);
+                    mPresenter.loadItems(null, NOW_PLAYING, INITIAL_OFF_SET);
                     break;
 
                 case R.id.action_top_rated:
                     selectedBottomNavigationItem = TOP_RATED;
                     mBinding.movieDescText.setText(R.string.top_rated_label);
-                    mActions.loadItems(null, TOP_RATED, INITIAL_OFF_SET);
+                    mPresenter.loadItems(null, TOP_RATED, INITIAL_OFF_SET);
                     break;
             }
             return true;

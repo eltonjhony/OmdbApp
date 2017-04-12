@@ -11,6 +11,8 @@ import com.movies.android.aou.data.remote.ErrorHandler;
 import com.movies.android.aou.data.remote.API;
 import com.movies.android.aou.infraestructure.ApplicationConfiguration;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -25,9 +27,13 @@ public class TvShowsPresenter implements TvShowsContract.Actions {
     private API mApi;
     private TvShowsContract.View mView;
 
-    public TvShowsPresenter(API api, TvShowsContract.View view) {
-        this.mView = view;
+    @Inject
+    public TvShowsPresenter(API api) {
         this.mApi = api;
+    }
+
+    public void setView(@NonNull TvShowsFragment view) {
+        this.mView = view;
     }
 
     @Override
@@ -87,6 +93,11 @@ public class TvShowsPresenter implements TvShowsContract.Actions {
                         mView.displayTvShowsDetails(tvShowsDetail);
                     }
                 });
+    }
+
+    @Override
+    public void onDestroy() {
+        this.mView = null;
     }
 
     private void searchTvShows(String query, int offSet) {

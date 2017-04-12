@@ -36,5 +36,7 @@ public interface MoviesContract {
         void retrieveFeaturedVideo(List<Movie> movies);
 
         void openDetails(@NonNull String id);
+
+        void onDestroy();
     }
 }

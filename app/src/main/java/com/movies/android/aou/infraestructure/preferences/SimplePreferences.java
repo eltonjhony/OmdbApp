@@ -2,7 +2,8 @@ package com.movies.android.aou.infraestructure.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.text.TextUtils;
+
+import static com.movies.android.aou.infraestructure.Constants.PreferenceKeys.SIMPLE_PREF_KEY;
 
 /**
  * Created by eltonjhony on 4/6/17.
@@ -10,28 +11,23 @@ import android.text.TextUtils;
 public abstract class SimplePreferences {
 
     private SharedPreferences mPreferences;
-    private String mKey;
 
     private SimplePreferences() {
     }
 
-    public SimplePreferences(Context context, String key) {
-        if (TextUtils.isEmpty(key)) {
-            throw new RuntimeException("Could not create SharedPreferences without key");
-        }
-        this.mPreferences = context.getSharedPreferences(key, Context.MODE_PRIVATE);
-        this.mKey = key;
+    public SimplePreferences(Context context) {
+        this.mPreferences = context.getSharedPreferences(SIMPLE_PREF_KEY, Context.MODE_PRIVATE);
     }
 
-    public void saveAsync(String value) {
+    public void saveAsync(String key, String value) {
         SharedPreferences.Editor editor = mPreferences.edit();
-        editor.putString(this.mKey, value);
+        editor.putString(key, value);
         editor.apply();
     }
 
-    public String get() {
+    public String get(String key) {
         try {
-            return mPreferences.getString(this.mKey, null);
+            return mPreferences.getString(key, null);
         } catch (NullPointerException e) {
             return null;
         }
