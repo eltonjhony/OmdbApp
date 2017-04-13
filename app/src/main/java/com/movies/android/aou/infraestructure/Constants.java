@@ -9,8 +9,6 @@ public class Constants {
     }
 
     public interface PreferenceKeys {
-        String SIMPLE_PREF_KEY = new String(new char[]{'a', 's', 'd', 'f', 'c', 'a', 'f', 'd', 'g',
-                's', 'f', 'v', 'c', 'x', 'e', 'r', 'd', 't', 'y', 'j', 'h', 'g', 'f', 'd', 's', 'e' });
 
         String SEARCHER_KEY = new String(new char[]{'a', 's', 'd', 'e', 'c', 'a', 'f', 'd', 'g',
                 'h', 'u', 'i', 'r', 'x', 'e', 'r', 'd', 't', 'y', 't', 'q', 's', 't', 'd', 's', 'e' });

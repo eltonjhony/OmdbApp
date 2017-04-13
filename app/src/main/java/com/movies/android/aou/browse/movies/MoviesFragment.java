@@ -14,7 +14,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,7 +31,9 @@ import com.movies.android.aou.data.model.ContentSegmentEnum;
 import com.movies.android.aou.databinding.FragmentMoviesBinding;
 import com.movies.android.aou.infraestructure.MyApplication;
 import com.movies.android.aou.infraestructure.MyLog;
-import com.movies.android.aou.infraestructure.preferences.SimplePreferences;
+import com.movies.android.aou.infraestructure.preferences.CollapseFeaturedVideoPreferences;
+import com.movies.android.aou.infraestructure.preferences.MainPagerPreferences;
+import com.movies.android.aou.infraestructure.preferences.SearcherPreferences;
 import com.movies.android.aou.main.MainActivity;
 import com.movies.android.aou.details.DetailsActivity;
 import com.movies.android.aou.views.AnimatingFrameLayout;
@@ -52,14 +53,11 @@ import static com.movies.android.aou.infraestructure.Constants.PreferenceKeys.PA
 import static com.movies.android.aou.infraestructure.Constants.PreferenceKeys.SEARCHER_KEY;
 import static com.movies.android.aou.infraestructure.Constants.PreferenceKeys.SHOW_HIDE_KEY;
 import static com.movies.android.aou.main.adapters.MainPageAdapter.MOVIES_INDEX;
-import static java.lang.String.valueOf;
 
 /**
  * Created by eltonjhony on 3/31/17.
  */
 public class MoviesFragment extends Fragment implements MoviesContract.View {
-
-    public static final String HIDE_FEATURED_VIDEO = "HIDE";
 
     private FragmentMoviesBinding mBinding;
 
@@ -70,7 +68,13 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     MoviesPresenter mPresenter;
 
     @Inject
-    SimplePreferences mSimplePreferences;
+    CollapseFeaturedVideoPreferences mCollapseFeaturedVideoPref;
+
+    @Inject
+    SearcherPreferences mSearcherPref;
+
+    @Inject
+    MainPagerPreferences mMainPagerPref;
 
     private ContentSegmentEnum selectedBottomNavigationItem = POPULAR;
 
@@ -93,7 +97,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        if (TextUtils.isEmpty(this.mSimplePreferences.get(SHOW_HIDE_KEY))) {
+        if (this.mCollapseFeaturedVideoPref.getBoolean(SHOW_HIDE_KEY)) {
             mBinding.youtubeplayerfragment.show();
         } else {
             mBinding.youtubeplayerfragment.hide();
@@ -132,7 +136,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mSimplePreferences.saveAsync(SEARCHER_KEY, query);
+                mSearcherPref.putString(SEARCHER_KEY, query);
                 mPresenter.loadItems(query, selectedBottomNavigationItem, INITIAL_OFF_SET);
                 return true;
             }
@@ -153,7 +157,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.search:
-                        mSimplePreferences.clear();
+                        mSearcherPref.clear();
                 }
                 return true;
             }
@@ -177,7 +181,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Override
     public void showMovieDetails(MovieDetail detail) {
-        mSimplePreferences.saveAsync(PAGER_KEY, valueOf(MOVIES_INDEX));
+        mMainPagerPref.putInt(PAGER_KEY, MOVIES_INDEX);
         Intent intent = new Intent(getContext(), DetailsActivity.class);
         intent.putExtra(DetailsActivity.MOVIE_EXTRA, Parcels.wrap(detail));
         startActivity(intent);
@@ -209,10 +213,10 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
             AnimatingFrameLayout youtubeFrameLayout = mBinding.youtubeplayerfragment;
             if (youtubeFrameLayout.isVisible()) {
                 youtubeFrameLayout.hide();
-                this.mSimplePreferences.saveAsync(SHOW_HIDE_KEY, HIDE_FEATURED_VIDEO);
+                this.mCollapseFeaturedVideoPref.putBoolean(SHOW_HIDE_KEY, false);
             } else {
                 youtubeFrameLayout.show();
-                this.mSimplePreferences.saveAsync(SHOW_HIDE_KEY, "");
+                this.mCollapseFeaturedVideoPref.putBoolean(SHOW_HIDE_KEY, true);
             }
         });
     }
@@ -234,12 +238,12 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
-        refreshLayout.setOnRefreshListener(() -> mPresenter.loadItems(mSimplePreferences.get(SEARCHER_KEY),
+        refreshLayout.setOnRefreshListener(() -> mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY),
                 selectedBottomNavigationItem, INITIAL_OFF_SET));
         rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {
             @Override
             public void onLoadMore(int page, int totalItemCount, RecyclerView recyclerView) {
-                mPresenter.loadItems(mSimplePreferences.get(SEARCHER_KEY), selectedBottomNavigationItem, page);
+                mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY), selectedBottomNavigationItem, page);
             };
         });
     }

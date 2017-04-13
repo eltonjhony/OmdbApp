@@ -29,7 +29,8 @@ import com.movies.android.aou.data.model.TvShowsDetail;
 import com.movies.android.aou.databinding.FragmentTvShowsBinding;
 import com.movies.android.aou.infraestructure.MyApplication;
 import com.movies.android.aou.infraestructure.MyLog;
-import com.movies.android.aou.infraestructure.preferences.SimplePreferences;
+import com.movies.android.aou.infraestructure.preferences.MainPagerPreferences;
+import com.movies.android.aou.infraestructure.preferences.SearcherPreferences;
 import com.movies.android.aou.main.MainActivity;
 import com.movies.android.aou.details.DetailsActivity;
 import com.movies.android.aou.views.RecyclerViewWithEmptySupport;
@@ -47,7 +48,6 @@ import static com.movies.android.aou.data.model.ContentSegmentEnum.TOP_RATED;
 import static com.movies.android.aou.infraestructure.Constants.PreferenceKeys.PAGER_KEY;
 import static com.movies.android.aou.infraestructure.Constants.PreferenceKeys.SEARCHER_KEY;
 import static com.movies.android.aou.main.adapters.MainPageAdapter.TV_SHOWS_INDEX;
-import static java.lang.String.valueOf;
 
 /**
  * Created by eltonjhony on 3/31/17.
@@ -63,7 +63,10 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
     TvShowsPresenter mPresenter;
 
     @Inject
-    SimplePreferences mSimplePreferences;
+    SearcherPreferences mSearcherPref;
+
+    @Inject
+    MainPagerPreferences mMainPagerPref;
 
     private ContentSegmentEnum selectedBottomNavigationItem = POPULAR;
 
@@ -85,7 +88,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.loadItems(mSimplePreferences.get(SEARCHER_KEY), selectedBottomNavigationItem, INITIAL_OFF_SET);
+        mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY), selectedBottomNavigationItem, INITIAL_OFF_SET);
     }
 
     @Nullable
@@ -115,7 +118,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                mSimplePreferences.saveAsync(SEARCHER_KEY, query);
+                mSearcherPref.putString(SEARCHER_KEY, query);
                 mPresenter.loadItems(query, selectedBottomNavigationItem, INITIAL_OFF_SET);
                 return true;
             }
@@ -136,7 +139,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
             public boolean onMenuItemActionCollapse(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.search:
-                        mSimplePreferences.clear();
+                        mSearcherPref.clear();
                 }
                 return true;
             }
@@ -159,7 +162,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
 
     @Override
     public void displayTvShowsDetails(TvShowsDetail detail) {
-        mSimplePreferences.saveAsync(PAGER_KEY, valueOf(TV_SHOWS_INDEX));
+        mMainPagerPref.putInt(PAGER_KEY, TV_SHOWS_INDEX);
         Intent intent = new Intent(getContext(), DetailsActivity.class);
         intent.putExtra(DetailsActivity.TV_SHOW_EXTRA, Parcels.wrap(detail));
         startActivity(intent);
@@ -198,12 +201,12 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         refreshLayout.setOnRefreshListener(() -> {
-            mPresenter.loadItems(mSimplePreferences.get(SEARCHER_KEY), selectedBottomNavigationItem, INITIAL_OFF_SET);
+            mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY), selectedBottomNavigationItem, INITIAL_OFF_SET);
         });
         rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {
             @Override
             public void onLoadMore(int page, int totalItemCount, RecyclerView recyclerView) {
-                mPresenter.loadItems(mSimplePreferences.get(SEARCHER_KEY), selectedBottomNavigationItem, page);
+                mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY), selectedBottomNavigationItem, page);
             }
         });
     }
