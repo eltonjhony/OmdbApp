@@ -2,6 +2,9 @@ package com.movies.android.aou.data.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 
 /**
@@ -29,5 +32,37 @@ public class Movie extends Content implements Serializable {
 
     public String getOriginalTitle() {
         return originalTitle;
+    }
+
+    public boolean areContentsTheSame(Movie newItem) {
+        return this.equals(newItem);
+    }
+
+    public boolean areItemsTheSame(Movie item2) {
+        return this.getId().equals(item2.getId());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Movie)) return false;
+
+        Movie movie = (Movie) o;
+
+        return new EqualsBuilder()
+                .append(getId(), movie.getId())
+                .append(getTitle(), movie.getTitle())
+                .append(getOriginalTitle(), movie.getOriginalTitle())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getId())
+                .append(getTitle())
+                .append(getOriginalTitle())
+                .toHashCode();
     }
 }

@@ -13,4 +13,5 @@
     <string name="top_rated_label">top rated</string>
     <string name="on_the_air_label">on the air</string>
     <string name="most_popular_label">Most Popular</string>
+    <string name="list_type_hint">list type</string>
 </resources>

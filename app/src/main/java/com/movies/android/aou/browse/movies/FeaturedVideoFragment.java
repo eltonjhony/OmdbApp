@@ -41,7 +41,7 @@ public class FeaturedVideoFragment extends YouTubePlayerSupportFragment {
                 mYoutubePlayer = youTubePlayer;
                 mYoutubePlayer.setPlayerStyle(YouTubePlayer.PlayerStyle.DEFAULT);
                 if (!b) {
-                    mYoutubePlayer.loadVideo(getArguments().getString(FeaturedVideoFragment.VIDEO_URL_EXTRA), 0);
+                    mYoutubePlayer.cueVideo(getArguments().getString(FeaturedVideoFragment.VIDEO_URL_EXTRA), 0);
                 }
             }
 

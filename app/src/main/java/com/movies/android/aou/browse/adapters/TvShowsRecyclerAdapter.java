@@ -3,16 +3,17 @@ package com.movies.android.aou.browse.adapters;
 import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.graphics.Typeface;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 
+import com.bumptech.glide.Glide;
 import com.movies.android.aou.R;
 import com.movies.android.aou.data.model.TvShows;
 import com.movies.android.aou.databinding.ContentItemBinding;
-import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class TvShowsRecyclerAdapter extends RecyclerView.Adapter<TvShowsRecycler
     private OnContentItemClickListener mOnItemClickListener;
 
     public TvShowsRecyclerAdapter(List<TvShows> results, OnContentItemClickListener listener) {
-        setList(results);
+        this.mResults = results;
         this.mOnItemClickListener = listener;
     }
 
@@ -51,27 +52,22 @@ public class TvShowsRecyclerAdapter extends RecyclerView.Adapter<TvShowsRecycler
     }
 
     public void replaceData(List<TvShows> data) {
-        setList(data);
-        notifyDataSetChanged();
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new ContentDiffCallback(this.mResults, data));
+        this.mResults.clear();
+        this.mResults.addAll(data);
+        diffResult.dispatchUpdatesTo(this);
     }
 
     public void appendData(List<TvShows> data) {
-        if (data != null && !data.isEmpty()) {
-            int currentSize = this.mResults.size();
-            this.mResults.addAll(data);
-            notifyItemRangeInserted(currentSize, this.mResults.size() - 1);
-            notifyDataSetChanged();
-        } else if (this.mResults == null) {
-            replaceData(data);
+        if (data == null || data.isEmpty()) {
+            return;
         }
-
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new ContentDiffCallback(this.mResults, data));
+        this.mResults.addAll(data);
+        diffResult.dispatchUpdatesTo(this);
     }
 
-    private void setList(List<TvShows> tvShowses) {
-        this.mResults = tvShowses;
-    }
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends BaseHolder<TvShows> {
 
         private ContentItemBinding mLayout;
 
@@ -80,10 +76,11 @@ public class TvShowsRecyclerAdapter extends RecyclerView.Adapter<TvShowsRecycler
             this.mLayout = binding;
         }
 
-        private void update(TvShows tvShows) {
-            Picasso.with(mLayout.thumbnailView.getContext())
+        @Override
+        public void update(TvShows tvShows) {
+            Glide.with(mLayout.thumbnailView.getContext())
                     .load(tvShows.getPosterUrl())
-                    .fit().centerCrop()
+                    .centerCrop()
                     .placeholder(R.drawable.ic_insert_photo_black_48px)
                     .into(mLayout.thumbnailView);
             if (TextUtils.isEmpty(tvShows.getPosterUrl())) {
@@ -91,10 +88,13 @@ public class TvShowsRecyclerAdapter extends RecyclerView.Adapter<TvShowsRecycler
                         Typeface.createFromAsset(mLayout.titleView.getContext().getAssets(),
                                 "fonts/CaviarDreams.ttf"));
                 mLayout.titleView.setText(tvShows.getName());
+            } else {
+                mLayout.titleView.setText(null);
             }
         }
 
-        private void setListeners(final TvShows tvShows) {
+        @Override
+        public void setListeners(final TvShows tvShows) {
             itemView.setOnClickListener(v -> {
                 v.startAnimation(AnimationUtils.loadAnimation(v.getContext(), R.anim.image_click));
                 mOnItemClickListener.onClicked(tvShows.getId());

@@ -8,7 +8,9 @@ import android.support.v7.widget.RecyclerView;
  */
 public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
 
-    private int currentPage = 0;
+    private static final int NUMBER_OF_REMAINING_ITEMS = 1;
+
+    private int currentPage = 1;
 
     private RecyclerView.LayoutManager mLayoutManager;
 
@@ -22,10 +24,14 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
         int lastVisibleItemPosition = ((GridLayoutManager) mLayoutManager).findLastVisibleItemPosition();
         int totalItemCount = mLayoutManager.getItemCount();
 
-        if (lastVisibleItemPosition == totalItemCount - 1) {
+        if (lastVisibleItemPosition == totalItemCount - NUMBER_OF_REMAINING_ITEMS) {
             currentPage++;
             onLoadMore(currentPage, totalItemCount, recyclerView);
         }
+    }
+
+    public void resetCurrentPage() {
+        this.currentPage = 1;
     }
 
     public abstract void onLoadMore(int currentPage, int totalItemCount, RecyclerView recyclerView);

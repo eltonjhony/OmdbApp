@@ -63,6 +63,7 @@ dependencies {
     final converterVersion = '2.0.0'
     final parcelerVersion = '1.1.6'
     final loggingInterceptorVersion = '3.2.0'
+    final glideVersion = '3.7.0'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -104,6 +105,7 @@ dependencies {
     compile "com.squareup.retrofit2:converter-gson:${converterVersion}"
     compile "com.squareup.okhttp3:logging-interceptor:${loggingInterceptorVersion}"
     compile "org.parceler:parceler-api:${parcelerVersion}"
+    compile "com.github.bumptech.glide:glide:${glideVersion}"
 
     annotationProcessor "org.parceler:parceler:${parcelerVersion}"
 

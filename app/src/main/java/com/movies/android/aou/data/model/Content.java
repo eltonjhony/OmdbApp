@@ -4,6 +4,9 @@ import android.text.TextUtils;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 
 /**
@@ -39,5 +42,27 @@ public class Content implements Serializable {
         StringBuilder builder = new StringBuilder(BASE_POSTER_URL);
         builder.append(IMG_SIZE_185).append("/").append(posterUrl);
         return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof Content)) return false;
+
+        Content content = (Content) o;
+
+        return new EqualsBuilder()
+                .append(getId(), content.getId())
+                .append(getPosterUrl(), content.getPosterUrl())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getId())
+                .append(getPosterUrl())
+                .toHashCode();
     }
 }

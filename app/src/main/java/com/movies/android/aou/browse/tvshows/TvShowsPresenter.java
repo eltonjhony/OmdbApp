@@ -3,6 +3,7 @@ package com.movies.android.aou.browse.tvshows;
 import android.text.TextUtils;
 
 import com.android.annotations.NonNull;
+import com.movies.android.aou.common.BasePresenter;
 import com.movies.android.aou.data.model.ContentSegmentEnum;
 import com.movies.android.aou.data.model.DataResultWrapper;
 import com.movies.android.aou.data.model.TvShows;
@@ -15,6 +16,7 @@ import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Observer;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -22,46 +24,43 @@ import rx.schedulers.Schedulers;
  * Created by eltonjhony on 3/31/17.
  */
 
-public class TvShowsPresenter implements TvShowsContract.Actions {
+public class TvShowsPresenter extends BasePresenter<TvShowsContract.View> implements TvShowsContract.Actions {
 
     private API mApi;
-    private TvShowsContract.View mView;
+
+    private Subscription mSubscription;
 
     @Inject
     public TvShowsPresenter(API api) {
         this.mApi = api;
     }
 
-    public void setView(@NonNull TvShowsFragment view) {
-        this.mView = view;
-    }
-
     @Override
     public void loadItems(String query, ContentSegmentEnum contentSegmentEnum, int offSet) {
         if (TextUtils.isEmpty(query)) {
-            mView.setLoading(true);
+            getViewOrThrow().setLoading(true);
             Observable<DataResultWrapper<TvShows>> observable = this.getTvShowsEndpointBySegment(contentSegmentEnum, offSet);
-            observable
+            mSubscription = observable
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<DataResultWrapper<TvShows>>() {
                         @Override
                         public void onCompleted() {
-                            mView.setLoading(false);
+                            getView().setLoading(false);
                         }
 
                         @Override
                         public void onError(Throwable e) {
                             ErrorHandler.Error error = new ErrorHandler(e).extract();
-                            mView.showError(error.message);
+                            getView().showError(error.message);
                         }
 
                         @Override
                         public void onNext(DataResultWrapper<TvShows> dataResultWrapper) {
                             if (dataResultWrapper.getPage() == 1) {
-                                mView.displayTvShows(dataResultWrapper.getData());
+                                getView().displayTvShows(dataResultWrapper.getData());
                             } else {
-                                mView.displayMoreTvShows(dataResultWrapper.getData());
+                                getView().displayMoreTvShows(dataResultWrapper.getData());
                             }
                         }
                     });
@@ -72,57 +71,60 @@ public class TvShowsPresenter implements TvShowsContract.Actions {
 
     @Override
     public void openDetails(@NonNull String id) {
-        mView.setLoading(true);
-        mApi.getTvShowById(id, ApplicationConfiguration.getApiKey())
+        getViewOrThrow().setLoading(true);
+        mSubscription = mApi.getTvShowById(id, ApplicationConfiguration.getApiKey())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<TvShowsDetail>() {
                     @Override
                     public void onCompleted() {
-                        mView.setLoading(false);
+                        getView().setLoading(false);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         ErrorHandler.Error error = new ErrorHandler(e).extract();
-                        mView.showError(error.message);
+                        getViewOrThrow().showError(error.message);
                     }
 
                     @Override
                     public void onNext(TvShowsDetail tvShowsDetail) {
-                        mView.displayTvShowsDetails(tvShowsDetail);
+                        getView().displayTvShowsDetails(tvShowsDetail);
                     }
                 });
     }
 
     @Override
     public void onDestroy() {
-        this.mView = null;
+        if (mSubscription != null) {
+            mSubscription.unsubscribe();
+        }
+        super.detachView();
     }
 
     private void searchTvShows(String query, int offSet) {
-        mView.setLoading(true);
-        mApi.searchTvShows(ApplicationConfiguration.getApiKey(), query, offSet)
+        getViewOrThrow().setLoading(true);
+        mSubscription = mApi.searchTvShows(ApplicationConfiguration.getApiKey(), query, offSet)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<DataResultWrapper<TvShows>>() {
                     @Override
                     public void onCompleted() {
-                        mView.setLoading(false);
+                        getView().setLoading(false);
                     }
 
                     @Override
                     public void onError(Throwable e) {
                         ErrorHandler.Error error = new ErrorHandler(e).extract();
-                        mView.showError(error.message);
+                        getView().showError(error.message);
                     }
 
                     @Override
                     public void onNext(DataResultWrapper<TvShows> dataResultWrapper) {
                         if (dataResultWrapper.getPage() == 1) {
-                            mView.displayTvShows(dataResultWrapper.getData());
+                            getView().displayTvShows(dataResultWrapper.getData());
                         } else {
-                            mView.displayMoreTvShows(dataResultWrapper.getData());
+                            getView().displayMoreTvShows(dataResultWrapper.getData());
                         }
                     }
                 });

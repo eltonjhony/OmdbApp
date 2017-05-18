@@ -24,6 +24,8 @@ public class DetailsActivity extends AppCompatActivity {
         MovieDetail movieDetail = Parcels.unwrap(getIntent().getParcelableExtra(MOVIE_EXTRA));
         TvShowsDetail tvShowsDetail = Parcels.unwrap(getIntent().getParcelableExtra(TV_SHOW_EXTRA));
 
+        //TODO movie details not done yet!
+
         if (movieDetail != null) {
             MyLog.debug(DetailsActivity.class.getSimpleName(), movieDetail.toString());
         }

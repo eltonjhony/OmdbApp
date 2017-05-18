@@ -13,8 +13,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,6 +67,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
     MainPagerPreferences mMainPagerPref;
 
     private ContentSegmentEnum selectedBottomNavigationItem = POPULAR;
+    private EndlessRecyclerViewScrollListener mScrollListener;
 
     public TvShowsFragment() {
     }
@@ -107,43 +106,42 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search:
+                SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
+                MenuItemCompat.setActionView(item, searchView);
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        mSearcherPref.putString(SEARCHER_KEY, query);
+                        mPresenter.loadItems(query, selectedBottomNavigationItem, INITIAL_OFF_SET);
+                        return true;
+                    }
 
-        inflater.inflate(R.menu.search_menu, menu);
-        MenuItem item = menu.findItem(R.id.search);
-        SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
-        MenuItemCompat.setActionView(item, searchView);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mSearcherPref.putString(SEARCHER_KEY, query);
-                mPresenter.loadItems(query, selectedBottomNavigationItem, INITIAL_OFF_SET);
-                return true;
-            }
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        MyLog.info(TvShowsFragment.class.getSimpleName(), newText);
+                        return true;
+                    }
+                });
+                MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        return true;
+                    }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                MyLog.info(TvShowsFragment.class.getSimpleName(), newText);
-                return true;
-            }
-        });
-        MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.search:
-                        mSearcherPref.clear();
-                }
-                return true;
-            }
-        });
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.search:
+                                mSearcherPref.clear();
+                        }
+                        return true;
+                    }
+                });
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -157,7 +155,8 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
 
     @Override
     public void displayTvShows(List<TvShows> tvShows) {
-        mAdapter.replaceData(tvShows);
+        this.mScrollListener.resetCurrentPage();
+        this.mAdapter.replaceData(tvShows);
     }
 
     @Override
@@ -179,7 +178,7 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
     }
 
     private void initialize() {
-        mPresenter.setView(this);
+        mPresenter.attachView(this);
         mAdapter = new TvShowsRecyclerAdapter(new ArrayList<>(0), id -> mPresenter.openDetails(id));
     }
 
@@ -200,14 +199,17 @@ public class TvShowsFragment extends Fragment implements TvShowsContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
-        refreshLayout.setOnRefreshListener(() -> {
-            mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY), selectedBottomNavigationItem, INITIAL_OFF_SET);
-        });
-        rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {
+
+        mScrollListener = new EndlessRecyclerViewScrollListener(layout) {
             @Override
             public void onLoadMore(int page, int totalItemCount, RecyclerView recyclerView) {
                 mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY), selectedBottomNavigationItem, page);
             }
+        };
+        rv.addOnScrollListener(mScrollListener);
+
+        refreshLayout.setOnRefreshListener(() -> {
+            mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY), selectedBottomNavigationItem, INITIAL_OFF_SET);
         });
     }
 

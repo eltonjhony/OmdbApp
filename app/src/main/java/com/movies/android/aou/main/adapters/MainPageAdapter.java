@@ -3,7 +3,7 @@ package com.movies.android.aou.main.adapters;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.movies.android.aou.R;
 import com.movies.android.aou.browse.movies.MoviesFragment;
@@ -12,7 +12,7 @@ import com.movies.android.aou.browse.tvshows.TvShowsFragment;
 /**
  * Created by eltonjhony on 4/4/17.
  */
-public class MainPageAdapter extends FragmentPagerAdapter {
+public class MainPageAdapter extends FragmentStatePagerAdapter {
 
     public static final int MOVIES_INDEX = 0;
     public static final int TV_SHOWS_INDEX = 1;
@@ -51,5 +51,4 @@ public class MainPageAdapter extends FragmentPagerAdapter {
         }
         return super.getPageTitle(position);
     }
-
 }

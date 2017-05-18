@@ -33,8 +33,6 @@ public interface MoviesContract {
     interface Actions {
         void loadItems(String query, ContentSegmentEnum contentSegmentEnum, int offSet);
 
-        void retrieveFeaturedVideo(List<Movie> movies);
-
         void openDetails(@NonNull String id);
 
         void onDestroy();

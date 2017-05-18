@@ -15,8 +15,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +35,6 @@ import com.movies.android.aou.infraestructure.preferences.SearcherPreferences;
 import com.movies.android.aou.main.MainActivity;
 import com.movies.android.aou.details.DetailsActivity;
 import com.movies.android.aou.views.AnimatingFrameLayout;
-import com.movies.android.aou.views.RecyclerViewWithEmptySupport;
 
 import org.parceler.Parcels;
 
@@ -78,6 +75,8 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     private ContentSegmentEnum selectedBottomNavigationItem = POPULAR;
 
+    private EndlessRecyclerViewScrollListener mScrollListener;
+
     public MoviesFragment() {
     }
 
@@ -90,19 +89,9 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
         MyApplication.getServiceComponent().inject(this);
         initialize();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (this.mCollapseFeaturedVideoPref.getBoolean(SHOW_HIDE_KEY)) {
-            mBinding.youtubeplayerfragment.show();
-        } else {
-            mBinding.youtubeplayerfragment.hide();
-        }
-        mPresenter.loadItems(null, selectedBottomNavigationItem, INITIAL_OFF_SET);
     }
 
     @Nullable
@@ -119,49 +108,63 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (this.mCollapseFeaturedVideoPref.getBoolean(SHOW_HIDE_KEY)) {
+            mBinding.youtubeplayerfragment.show();
+        } else {
+            mBinding.youtubeplayerfragment.hide();
+        }
+        mPresenter.loadItems(null, selectedBottomNavigationItem, INITIAL_OFF_SET);
+    }
+
+    @Override
     public void onDestroy() {
         this.mPresenter.onDestroy();
         super.onDestroy();
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        menu.clear();
+    public boolean onOptionsItemSelected(MenuItem item) {
 
-        inflater.inflate(R.menu.search_menu, menu);
-        MenuItem item = menu.findItem(R.id.search);
-        SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
-        MenuItemCompat.setActionView(item, searchView);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                mSearcherPref.putString(SEARCHER_KEY, query);
-                mPresenter.loadItems(query, selectedBottomNavigationItem, INITIAL_OFF_SET);
-                return true;
-            }
+        switch (item.getItemId()) {
+            case R.id.search:
+                SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
+                MenuItemCompat.setActionView(item, searchView);
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        mSearcherPref.putString(SEARCHER_KEY, query);
+                        mPresenter.loadItems(query, selectedBottomNavigationItem, INITIAL_OFF_SET);
+                        return true;
+                    }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                MyLog.info(MoviesFragment.class.getSimpleName(), newText);
-                return true;
-            }
-        });
-        MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                return true;
-            }
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        MyLog.info(MoviesFragment.class.getSimpleName(), newText);
+                        return true;
+                    }
+                });
+                MenuItemCompat.setOnActionExpandListener(item, new MenuItemCompat.OnActionExpandListener() {
+                    @Override
+                    public boolean onMenuItemActionExpand(MenuItem item) {
+                        return true;
+                    }
 
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.search:
-                        mSearcherPref.clear();
-                }
-                return true;
-            }
-        });
+                    @Override
+                    public boolean onMenuItemActionCollapse(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.search:
+                                mSearcherPref.clear();
+                        }
+                        return true;
+                    }
+                });
+
+            case R.id.list_type:
+                Toast.makeText(getContext(), "teste", Toast.LENGTH_LONG).show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -175,8 +178,8 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Override
     public void showMovies(List<Movie> movies) {
-        mPresenter.retrieveFeaturedVideo(movies);
-        mAdapter.replaceData(movies);
+        this.mScrollListener.resetCurrentPage();
+        this.mAdapter.replaceData(movies);
     }
 
     @Override
@@ -194,7 +197,7 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
 
     @Override
     public void appendMoreMovies(List<Movie> data) {
-        mAdapter.appendData(data);
+        this.mAdapter.appendData(data);
     }
 
     @Override
@@ -204,8 +207,10 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     }
 
     private void initialize() {
-        mPresenter.setView(this);
-        mAdapter = new MoviesRecyclerAdapter(new ArrayList<>(0), id -> mPresenter.openDetails(id));
+        mPresenter.attachView(this);
+        mAdapter = new MoviesRecyclerAdapter(new ArrayList<>(0), (position, id) -> {
+            mPresenter.openDetails(id);
+        });
     }
 
     private void setListeners() {
@@ -222,15 +227,16 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
     }
 
     private void setupAdapter() {
-        RecyclerViewWithEmptySupport rv = mBinding.movieList;
-        rv.setAdapter(mAdapter);
+        mBinding.movieList.setAdapter(mAdapter);
 
         final int numColumns = 3;
 
-        rv.setHasFixedSize(true);
-        GridLayoutManager layout = new GridLayoutManager(getContext(), numColumns);
-        rv.setLayoutManager(layout);
-        rv.setEmptyView(mBinding.emptyLayout.getRoot());
+        mBinding.movieList.setHasFixedSize(true);
+
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), numColumns);
+
+        mBinding.movieList.setLayoutManager(layoutManager);
+        mBinding.movieList.setEmptyView(mBinding.emptyLayout.getRoot());
 
         SwipeRefreshLayout refreshLayout = mBinding.refreshLayout;
         refreshLayout.setColorSchemeColors(
@@ -238,13 +244,19 @@ public class MoviesFragment extends Fragment implements MoviesContract.View {
                 ContextCompat.getColor(getActivity(), R.color.colorAccent),
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
-        refreshLayout.setOnRefreshListener(() -> mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY),
-                selectedBottomNavigationItem, INITIAL_OFF_SET));
-        rv.addOnScrollListener(new EndlessRecyclerViewScrollListener(layout) {
+
+        mScrollListener = new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemCount, RecyclerView recyclerView) {
                 mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY), selectedBottomNavigationItem, page);
             };
+        };
+
+        mBinding.movieList.addOnScrollListener(mScrollListener);
+
+        refreshLayout.setOnRefreshListener(() -> {
+            mPresenter.loadItems(mSearcherPref.getString(SEARCHER_KEY),
+                    selectedBottomNavigationItem, INITIAL_OFF_SET);
         });
     }
 
